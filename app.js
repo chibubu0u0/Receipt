@@ -29,6 +29,10 @@ const els = {
   purchaseToggleBtn: document.getElementById("purchaseToggleBtn"),
   adminTestPanel: document.getElementById("adminTestPanel"),
   testAddCreditsBtn: document.getElementById("testAddCreditsBtn"),
+  selectedPlanPanel: document.getElementById("selectedPlanPanel"),
+  selectedPlanTitle: document.getElementById("selectedPlanTitle"),
+  selectedPlanSubtitle: document.getElementById("selectedPlanSubtitle"),
+  confirmPurchaseBtn: document.getElementById("confirmPurchaseBtn"),
   cloudReceiptList: document.getElementById("cloudReceiptList"),
   refreshReceiptsBtn: document.getElementById("refreshReceiptsBtn"),
   receipt: document.getElementById("receipt"),
@@ -97,6 +101,7 @@ let supabaseClient = null;
 let currentSession = null;
 let currentCredits = null;
 let currentIsAdmin = false;
+let selectedPlanId = null;
 
 function setStatus(message, type = "") {
   els.status.textContent = message;
@@ -465,6 +470,9 @@ function setAuthState(session, credits) {
     els.userPanel.hidden = true;
     els.purchasePlans.hidden = true;
     els.adminTestPanel.hidden = true;
+    els.selectedPlanPanel.hidden = true;
+    selectedPlanId = null;
+    document.querySelectorAll(".plan-card").forEach(card => card.classList.remove("selected"));
     els.cloudReceipts.hidden = true;
     els.userEmail.textContent = "—";
     return;
@@ -567,19 +575,40 @@ const CREDIT_PLANS = {
   pro: { credits: 100, price: 299, label: "大包" }
 };
 
-async function handlePlanClick(event) {
+function handlePlanClick(event) {
   const button = event.currentTarget;
   const planId = button.dataset.plan;
   const plan = CREDIT_PLANS[planId];
 
   if (!plan) return;
 
+  selectedPlanId = planId;
+
+  document.querySelectorAll(".plan-card").forEach(card => {
+    card.classList.toggle("selected", card.dataset.plan === planId);
+  });
+
+  els.selectedPlanPanel.hidden = false;
+  els.selectedPlanTitle.textContent = `${plan.label}｜${plan.credits} 次｜NT$${plan.price}`;
+  els.selectedPlanSubtitle.textContent = "確認後才會建立購買訂單，不會因為單純點選方案就產生訂單。";
+  els.confirmPurchaseBtn.textContent = `加 ${plan.credits} 次`;
+  setStatus(`已選擇 ${plan.label}，請按「加 ${plan.credits} 次」確認。`, "ok");
+}
+
+async function confirmPurchaseOrder() {
+  if (!selectedPlanId) {
+    setStatus("請先選擇一個生成次數方案。", "error");
+    return;
+  }
+
+  const plan = CREDIT_PLANS[selectedPlanId];
+
   if (!currentSession) {
     setStatus("請先登入，再購買生成次數。", "error");
     return;
   }
 
-  button.disabled = true;
+  els.confirmPurchaseBtn.disabled = true;
   setStatus("正在建立付款訂單…");
 
   try {
@@ -589,7 +618,7 @@ async function handlePlanClick(event) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${currentSession.access_token}`
       },
-      body: JSON.stringify({ planId })
+      body: JSON.stringify({ planId: selectedPlanId })
     });
 
     const result = await response.json().catch(() => null);
@@ -603,7 +632,7 @@ async function handlePlanClick(event) {
     console.error(error);
     setStatus(error.message || "建立訂單失敗。", "error");
   } finally {
-    button.disabled = false;
+    els.confirmPurchaseBtn.disabled = false;
   }
 }
 
@@ -924,6 +953,7 @@ els.testAddCreditsBtn.addEventListener("click", testAddCredits);
 document.querySelectorAll(".plan-card").forEach(button => {
   button.addEventListener("click", handlePlanClick);
 });
+els.confirmPurchaseBtn.addEventListener("click", confirmPurchaseOrder);
 els.historyToggleBtn.addEventListener("click", () => {
   els.historyBox.classList.toggle("show");
   renderHistory();

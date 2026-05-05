@@ -87,6 +87,16 @@
                 </button>
               </div>
 
+              <div class="selected-plan-panel" id="selectedPlanPanel" hidden>
+                <div>
+                  <div class="selected-plan-title" id="selectedPlanTitle">尚未選擇方案</div>
+                  <div class="selected-plan-subtitle" id="selectedPlanSubtitle">請先選擇一個生成次數方案</div>
+                </div>
+                <button class="btn btn-primary selected-plan-btn" id="confirmPurchaseBtn" type="button">
+                  加次數
+                </button>
+              </div>
+
               <div class="purchase-note">
                 之後會接金流，付款成功後自動增加生成次數。
               </div>
@@ -205,6 +215,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=payment-architecture-1"></script>
+  <script src="./app.js?v=confirm-purchase-1"></script>
 </body>
 </html>

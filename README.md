@@ -264,3 +264,13 @@ supabase/payment_setup.sql
 7. 更新 `purchase_orders.status = paid`
 8. 增加 `user_credits.remaining_credits`
 9. 寫入 `credit_logs`
+
+
+## 購買確認流程修正
+
+這版修正購買流程：
+
+- 點擊小包 / 中包 / 大包時，只會選擇方案，不會立刻建立 `purchase_orders`
+- 選擇方案後，下方會出現確認按鈕，例如「加 10 次」
+- 只有點擊「加 10 次 / 加 30 次 / 加 100 次」後，才會呼叫 `/api/create-purchase-order` 並建立 pending 訂單
+- 選中的方案會有高亮效果

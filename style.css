@@ -1016,6 +1016,55 @@ h1 {
   text-align: center;
 }
 
+
+.plan-card.selected {
+  border-color: rgba(235,226,210,.8);
+  background: rgba(235,226,210,.15);
+  box-shadow: 0 0 0 3px rgba(235,226,210,.08);
+}
+
+.selected-plan-panel {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(235,226,210,.16);
+  background: rgba(235,226,210,.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.selected-plan-title {
+  color: var(--cream);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.selected-plan-subtitle {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.selected-plan-btn {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+}
+
+@media (max-width: 560px) {
+  .selected-plan-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .selected-plan-btn {
+    width: 100%;
+  }
+}
+
 @media (max-width: 980px) {
   .layout { grid-template-columns: 1fr; }
   .control-panel { position: static; }
