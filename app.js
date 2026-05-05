@@ -976,16 +976,6 @@ async function downloadPng() {
     els.savePanel.classList.add("show");
     els.savePanel.scrollIntoView({ behavior: "smooth", block: "center" });
     setStatus("圖片已顯示在下方。", "ok");
-      return;
-    }
-
-    const link = document.createElement("a");
-    link.download = filename;
-    link.href = dataUrl;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setStatus("PNG 已下載。", "ok");
   } catch (error) {
     console.error(error);
     setStatus(error.message || "圖片產生失敗，請換 Chrome 或 Safari 再試。", "error");

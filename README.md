@@ -399,3 +399,23 @@ computedUppAction = https://sandbox-api.payuni.com.tw/api/upp
 - 改用 Blob URL 下載，比 data URL 更穩
 - 手機版仍保留系統分享選單
 - `app.js` 版本改為 `desktop-blob-download-2`，避免瀏覽器吃到舊快取
+
+
+## 電腦下載 JS 修正版
+
+這版修正上一版 `app.js` 殘留舊下載程式碼造成的 JavaScript 語法錯誤。
+
+- 登入 / 註冊恢復正常
+- 電腦版維持 Blob 直接下載
+- 手機版維持分享選單
+- `app.js` 版本更新為 `desktop-download-jsfix-1`
+
+
+## 電腦下載 Clean 版
+
+這版確認修復上一版造成的 JavaScript 語法問題，並保留：
+
+- 登入 / 註冊功能
+- PAYUNi ReturnURL 修正
+- 電腦版 Blob 直接下載
+- 手機版系統分享選單
