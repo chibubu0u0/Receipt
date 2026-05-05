@@ -388,6 +388,29 @@ function renderHistory() {
 
 
 
+
+function showPaymentReturnMessage() {
+  const params = new URLSearchParams(window.location.search);
+  const payment = params.get("payment");
+
+  if (payment === "linepay_success") {
+    setStatus("LINE Pay 測試付款完成，生成次數已增加。", "ok");
+    history.replaceState({}, document.title, window.location.pathname);
+    refreshAccount();
+  }
+
+  if (payment === "linepay_cancelled") {
+    setStatus("LINE Pay 付款已取消，沒有扣款也沒有增加次數。", "error");
+    history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  if (payment === "linepay_error") {
+    setStatus("LINE Pay 付款確認失敗，請稍後再試或聯繫管理員。", "error");
+    history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
+
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     const existed = Array.from(document.scripts).some(script => script.src === src);
@@ -595,25 +618,6 @@ function handlePlanClick(event) {
   setStatus(`已選擇 ${plan.label}，請按「加 ${plan.credits} 次」確認。`, "ok");
 }
 
-
-function submitPaymentForm(action, fields) {
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = action;
-  form.style.display = "none";
-
-  Object.entries(fields).forEach(([key, value]) => {
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = key;
-    input.value = String(value);
-    form.appendChild(input);
-  });
-
-  document.body.appendChild(form);
-  form.submit();
-}
-
 async function confirmPurchaseOrder() {
   if (!selectedPlanId) {
     setStatus("請先選擇一個生成次數方案。", "error");
@@ -646,12 +650,12 @@ async function confirmPurchaseOrder() {
       throw new Error(result && result.error ? result.error : "建立訂單失敗。");
     }
 
-    if (!result.payment || !result.payment.action || !result.payment.fields) {
-      throw new Error("付款表單建立失敗。");
+    if (!result.paymentUrl) {
+      throw new Error("LINE Pay 付款網址建立失敗。");
     }
 
-    setStatus(`已建立待付款訂單 #${result.order.id}，正在前往綠界測試付款頁…`, "ok");
-    submitPaymentForm(result.payment.action, result.payment.fields);
+    setStatus(`已建立待付款訂單 #${result.order.id}，正在前往 LINE Pay 測試付款頁…`, "ok");
+    window.location.href = result.paymentUrl;
   } catch (error) {
     console.error(error);
     setStatus(error.message || "建立訂單失敗。", "error");
@@ -732,6 +736,7 @@ async function refreshCloudReceipts() {
 async function signUp() {
   if (!supabaseClient) {
     await initAuth();
+showPaymentReturnMessage();
   }
 
   if (!supabaseClient) {
@@ -766,6 +771,7 @@ async function signUp() {
 async function signIn() {
   if (!supabaseClient) {
     await initAuth();
+showPaymentReturnMessage();
   }
 
   if (!supabaseClient) {

@@ -276,44 +276,40 @@ supabase/payment_setup.sql
 - 選中的方案會有高亮效果
 
 
-## 綠界 ECPay Sandbox 串接版
+## LINE Pay Sandbox 串接版
 
-這版新增綠界測試環境付款流程：
+這版將購買生成次數改成 LINE Pay Sandbox 流程。
 
-- 使用者點「加 10 次 / 加 30 次 / 加 100 次」
-- 後端建立 `purchase_orders`
-- 後端產生綠界 AIO Checkout 表單參數與 `CheckMacValue`
-- 前端自動送出表單到綠界測試付款頁
-- 綠界付款完成後會 POST 到 `/api/ecpay-return`
-- 後端驗證 `CheckMacValue`
-- 驗證成功且 `RtnCode=1` 後：
-  - `purchase_orders.status` 改為 `paid`
-  - 寫入 `payments`
-  - `user_credits.remaining_credits` 增加
-  - 寫入 `credit_logs`
+### 新增 / 修改 API
+
+- `/api/create-purchase-order`
+  - 建立 `purchase_orders`
+  - 呼叫 LINE Pay `/v3/payments/request`
+  - 回傳 LINE Pay 付款網址給前端
+
+- `/api/linepay-confirm`
+  - LINE Pay 驗證完成後會導回這裡
+  - 後端呼叫 LINE Pay `/v3/payments/{transactionId}/confirm`
+  - confirm 成功後增加生成次數、寫入 `payments`、寫入 `credit_logs`
 
 ### Vercel Environment Variables
 
-測試環境可先不設 ECPay 變數，程式內建綠界官方測試用參數：
+請新增：
 
 ```txt
-ECPAY_MERCHANT_ID=2000132
-ECPAY_HASH_KEY=5294y06JbISpM5x9
-ECPAY_HASH_IV=v77hoKGq4kWxNNIS
-ECPAY_ACTION_URL=https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5
+LINE_PAY_CHANNEL_ID=你的 LINE Pay Sandbox Channel ID
+LINE_PAY_CHANNEL_SECRET=你的 LINE Pay Sandbox Channel Secret
+LINE_PAY_API_BASE_URL=https://sandbox-api-pay.line.me
 ```
 
-如果你想明確設定，也可以放到 Vercel Environment Variables。
-
-正式環境時一定要改成正式商店的 MerchantID / HashKey / HashIV / Action URL，且不要放到 GitHub。
-
-### 綠界測試信用卡
-
-常見測試卡：
+正式環境時改成：
 
 ```txt
-4311-9522-2222-2222
-CVV: 222
+LINE_PAY_API_BASE_URL=https://api-pay.line.me
 ```
 
-付款成功後請回網站重新整理，剩餘生成次數應該會增加。
+並且換成正式 Merchant 的 Channel ID / Channel Secret。
+
+### 重要提醒
+
+LINE Pay Online API v3 需要在 request 後將使用者導向 LINE Pay 付款頁；使用者完成驗證後，你的後端必須呼叫 Confirm API，付款才會真正完成並加點。
