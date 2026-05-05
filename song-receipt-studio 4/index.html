@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Song Receipt Studio｜AI 情感收據生成器</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-dot"></span><span>Song Receipt Studio</span></div>
+      <div class="top-actions">
+        <button class="btn btn-ghost" id="historyToggleBtn">歷史紀錄</button>
+        <button class="btn btn-ghost" id="resetBtn">清空畫面</button>
+      </div>
+    </div>
+
+    <section class="layout">
+      <div class="panel control-panel">
+        <h1>把一首歌<br />變成一張可收藏的收據</h1>
+        <p class="hero-copy">
+          進化版會把歌曲拆成情緒、歌曲具現化、色彩、旋律曲線與「心情結帳」。不是只分析歌曲，而是把一首歌做成一張可以分享的情感商品小票。
+        </p>
+
+        <div class="tabs" aria-label="分析模式">
+          <button class="tab active" data-depth="standard">標準分析</button>
+          <button class="tab" data-depth="deep">深層進化</button>
+          <button class="tab" data-depth="director">導演版</button>
+        </div>
+
+        <div class="form-grid">
+<div class="row">
+            <div class="field">
+              <label for="artist">歌手</label>
+              <input id="artist" type="text" placeholder="例如：Taylor Swift" />
+            </div>
+            <div class="field">
+              <label for="song">歌名</label>
+              <input id="song" type="text" placeholder="例如：cardigan" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="listenerNote">補充語氣／使用情境（可選）</label>
+            <textarea id="listenerNote" placeholder="例如：想要偏文青、像獨立唱片行小票、適合 Threads 分享"></textarea>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="themeSelect">收據風格</label>
+              <select id="themeSelect">
+                <option value="thermal">熱感應紙</option>
+                <option value="minimal">極簡收藏卡</option>
+                <option value="night">深夜黑票</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sizeSelect">輸出尺寸</label>
+              <select id="sizeSelect">
+                <option value="receiptOnly">只輸出收據</option>
+                <option value="square">方形貼文</option>
+                <option value="story">限時動態</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="generateBtn">產生進化版收據</button>
+          <button class="btn btn-secondary" id="demoBtn">載入範例</button>
+          <button class="btn btn-secondary" id="downloadBtn">下載／分享 PNG</button>
+        </div>
+
+        <div class="hint">
+          小提示：如果你要拿去當作品集，可以用「深層進化」；如果要做成社群貼文，可以用「導演版」加上方形或限動尺寸。
+        </div>
+        <div id="status" class="status"></div>
+
+        <div id="historyBox" class="history">
+          <div class="history-title">最近生成</div>
+          <div id="historyList" class="history-list"></div>
+        </div>
+      </div>
+
+      <div class="panel preview-panel">
+        <div class="stage">
+          <div class="capture-shell receiptOnly theme-thermal" id="captureArea">
+            <div class="receipt-wrap">
+              <article class="receipt" id="receipt">
+                <header class="receipt-head">
+                  <h2 class="receipt-title">歌曲收據</h2>
+                  <div class="receipt-subtitle">AI EMOTIONAL CHECKOUT</div>
+                  <div class="song-meta">
+                    <div class="song-name" id="receiptSong">Demo Song</div>
+                    <div class="artist-name" id="receiptArtist">Demo Artist</div>
+                  </div>
+                </header>
+                <div id="receiptBody"></div>
+                <footer class="receipt-foot">謝謝惠顧</footer>
+              </article>
+            </div>
+          </div>
+
+          <div class="save-panel" id="savePanel">
+            <p id="savePanelText">圖片已產生。手機可長按圖片儲存，或使用分享按鈕。</p>
+            <img id="saveImage" alt="歌曲收據圖片" />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
