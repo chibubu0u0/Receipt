@@ -56,37 +56,40 @@
             <button class="btn btn-ghost" id="signOutBtn">登出</button>
           </div>
 
-          <div class="purchase-plans" id="purchasePlans" hidden>
-            <div class="purchase-head">
+          <div class="purchase-plans collapsed" id="purchasePlans" hidden>
+            <button class="purchase-toggle" id="purchaseToggleBtn" type="button" aria-expanded="false">
               <div>
                 <div class="purchase-title">購買生成次數</div>
-                <div class="purchase-subtitle">付款功能準備中，先確認方案與價格</div>
+                <div class="purchase-subtitle">10 次 NT$49 起，付款功能準備中</div>
               </div>
-            </div>
+              <span class="purchase-chevron" aria-hidden="true">⌄</span>
+            </button>
 
-            <div class="plan-grid">
-              <button class="plan-card" data-plan="starter">
-                <span class="plan-name">小包</span>
-                <strong>10 次</strong>
-                <span class="plan-price">NT$49</span>
-              </button>
+            <div class="purchase-body" id="purchaseBody">
+              <div class="plan-grid">
+                <button class="plan-card" data-plan="starter">
+                  <span class="plan-name">小包</span>
+                  <strong>10 次</strong>
+                  <span class="plan-price">NT$49</span>
+                </button>
 
-              <button class="plan-card recommended" data-plan="standard">
-                <span class="plan-badge">推薦</span>
-                <span class="plan-name">中包</span>
-                <strong>30 次</strong>
-                <span class="plan-price">NT$129</span>
-              </button>
+                <button class="plan-card recommended" data-plan="standard">
+                  <span class="plan-badge">推薦</span>
+                  <span class="plan-name">中包</span>
+                  <strong>30 次</strong>
+                  <span class="plan-price">NT$129</span>
+                </button>
 
-              <button class="plan-card" data-plan="pro">
-                <span class="plan-name">大包</span>
-                <strong>100 次</strong>
-                <span class="plan-price">NT$299</span>
-              </button>
-            </div>
+                <button class="plan-card" data-plan="pro">
+                  <span class="plan-name">大包</span>
+                  <strong>100 次</strong>
+                  <span class="plan-price">NT$299</span>
+                </button>
+              </div>
 
-            <div class="purchase-note">
-              之後會接金流，付款成功後自動增加生成次數。
+              <div class="purchase-note">
+                之後會接金流，付款成功後自動增加生成次數。
+              </div>
             </div>
           </div>
 
@@ -193,6 +196,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=pricing-plans-1"></script>
+  <script src="./app.js?v=pricing-toggle-1"></script>
 </body>
 </html>

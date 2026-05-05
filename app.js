@@ -26,6 +26,7 @@ const els = {
   userEmail: document.getElementById("userEmail"),
   cloudReceipts: document.getElementById("cloudReceipts"),
   purchasePlans: document.getElementById("purchasePlans"),
+  purchaseToggleBtn: document.getElementById("purchaseToggleBtn"),
   cloudReceiptList: document.getElementById("cloudReceiptList"),
   refreshReceiptsBtn: document.getElementById("refreshReceiptsBtn"),
   receipt: document.getElementById("receipt"),
@@ -504,6 +505,12 @@ async function refreshAccount() {
 
 
 
+
+function togglePurchasePlans() {
+  const isCollapsed = els.purchasePlans.classList.toggle("collapsed");
+  els.purchaseToggleBtn.setAttribute("aria-expanded", String(!isCollapsed));
+}
+
 const CREDIT_PLANS = {
   starter: { credits: 10, price: 49, label: "小包" },
   standard: { credits: 30, price: 129, label: "中包" },
@@ -834,6 +841,7 @@ els.signInBtn.addEventListener("click", signIn);
 els.signUpBtn.addEventListener("click", signUp);
 els.signOutBtn.addEventListener("click", signOut);
 els.refreshReceiptsBtn.addEventListener("click", refreshCloudReceipts);
+els.purchaseToggleBtn.addEventListener("click", togglePurchasePlans);
 document.querySelectorAll(".plan-card").forEach(button => {
   button.addEventListener("click", handlePlanClick);
 });
