@@ -368,3 +368,16 @@ computedUppAction = https://sandbox-api.payuni.com.tw/api/upp
 ```
 
 如果看到自己的網站網址，或看到 `/upp/upp`，代表 PAYUNI_API_BASE_URL 填錯。
+
+
+## PAYUNi ReturnURL 缺 payload 修正
+
+這版修正 PAYUNi ReturnURL 只帶使用者回網站、但沒有附上 `EncryptInfo` / `HashInfo` 時會變成錯誤的問題。
+
+修正內容：
+
+- 建立訂單時，`ReturnURL` / `NotifyURL` 會加上 `orderId`
+- `/api/payuni-return` 如果沒有收到 `EncryptInfo` / `HashInfo`，會改用 `orderId` 查詢 `purchase_orders`
+- 若訂單已付款，導回 `payuni_success`
+- 若訂單尚未付款，導回 `payuni_pending`
+- 真正加點仍以 `NotifyURL` 或完整付款 payload 為準，避免誤加點
