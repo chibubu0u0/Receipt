@@ -167,6 +167,10 @@ function redirect(res, path) {
   return res.status(302).send("");
 }
 
+function safeQuery(value) {
+  return encodeURIComponent(String(value || "").slice(0, 120));
+}
+
 export default async function handler(req, res) {
   try {
     const result = decodePayuniResult(req.method === "POST" ? req.body : req.query);
@@ -175,15 +179,15 @@ export default async function handler(req, res) {
 
     if (!order) {
       console.error("PAYUNi return order not found", { merTradeNo, result });
-      return redirect(res, "/?payment=payuni_error");
+      return redirect(res, "/?payment=payuni_error&reason=order_not_found");
     }
 
     const outcome = await markOrderPaidIfNeeded(order, result);
     if (outcome.paid) return redirect(res, "/?payment=payuni_success");
 
-    return redirect(res, "/?payment=payuni_pending");
+    return redirect(res, `/?payment=payuni_pending&reason=${safeQuery(outcome.reason)}`);
   } catch (error) {
-    console.error(error);
-    return redirect(res, "/?payment=payuni_error");
+    console.error("PAYUNi return error:", error);
+    return redirect(res, `/?payment=payuni_error&reason=${safeQuery(error.message)}`);
   }
 }

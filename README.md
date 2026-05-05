@@ -337,3 +337,34 @@ https://receipt-six-tau.vercel.app/api/payuni-return
 ### 注意
 
 這版以 PAYUNi 官方 PHP SDK 的 UPP 流程轉成 Vercel / Node.js 實作。若你的 PAYUNi 帳號 API 文件要求額外欄位，請以 PAYUNi 後台或官方文件為準。
+
+
+## PAYUNi Debug 版本
+
+這版新增：
+
+- `/api/payuni-debug`
+  - 檢查 Vercel PAYUNI_API_BASE_URL
+  - 顯示實際會送出的 UPP action URL
+  - 顯示 Merchant ID 頭尾與 Hash / IV 是否存在
+  - 不會洩漏完整 Hash Key / IV Key
+
+部署後可打開：
+
+```txt
+https://你的網域/api/payuni-debug
+```
+
+正常正式環境應該看到：
+
+```txt
+computedUppAction = https://api.payuni.com.tw/api/upp
+```
+
+測試環境則是：
+
+```txt
+computedUppAction = https://sandbox-api.payuni.com.tw/api/upp
+```
+
+如果看到自己的網站網址，或看到 `/upp/upp`，代表 PAYUNI_API_BASE_URL 填錯。

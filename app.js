@@ -630,7 +630,7 @@ function showPaymentReturnMessage() {
   }
 
   if (payment === "payuni_error") {
-    setStatus("PAYUNi 付款確認失敗，請稍後再試或聯繫管理員。", "error");
+    setStatus("PAYUNi 回傳失敗或付款尚未完成。請查看 Vercel Functions Logs 的 /api/payuni-return 訊息。", "error");
     history.replaceState({}, document.title, window.location.pathname);
   }
 }
