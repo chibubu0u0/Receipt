@@ -25,6 +25,7 @@ const els = {
   userPanel: document.getElementById("userPanel"),
   userEmail: document.getElementById("userEmail"),
   cloudReceipts: document.getElementById("cloudReceipts"),
+  purchasePlans: document.getElementById("purchasePlans"),
   cloudReceiptList: document.getElementById("cloudReceiptList"),
   refreshReceiptsBtn: document.getElementById("refreshReceiptsBtn"),
   receipt: document.getElementById("receipt"),
@@ -458,6 +459,7 @@ function setAuthState(session, credits) {
     els.creditPill.textContent = "0 次";
     els.authForm.hidden = false;
     els.userPanel.hidden = true;
+    els.purchasePlans.hidden = true;
     els.cloudReceipts.hidden = true;
     els.userEmail.textContent = "—";
     return;
@@ -468,6 +470,7 @@ function setAuthState(session, credits) {
   els.creditPill.textContent = `${credits ?? 0} 次`;
   els.authForm.hidden = true;
   els.userPanel.hidden = false;
+  els.purchasePlans.hidden = false;
   els.cloudReceipts.hidden = false;
   els.userEmail.textContent = email;
 }
@@ -497,6 +500,28 @@ async function refreshAccount() {
     console.error(error);
     setStatus(error.message || "讀取會員資料失敗。", "error");
   }
+}
+
+
+
+const CREDIT_PLANS = {
+  starter: { credits: 10, price: 49, label: "小包" },
+  standard: { credits: 30, price: 129, label: "中包" },
+  pro: { credits: 100, price: 299, label: "大包" }
+};
+
+function handlePlanClick(event) {
+  const button = event.currentTarget;
+  const plan = CREDIT_PLANS[button.dataset.plan];
+
+  if (!plan) return;
+
+  if (!currentSession) {
+    setStatus("請先登入，再購買生成次數。", "error");
+    return;
+  }
+
+  setStatus(`${plan.label}：${plan.credits} 次 / NT$${plan.price}。付款功能尚未串接，下一步會接 TapPay / 綠界 / 藍新。`, "ok");
 }
 
 
@@ -809,6 +834,9 @@ els.signInBtn.addEventListener("click", signIn);
 els.signUpBtn.addEventListener("click", signUp);
 els.signOutBtn.addEventListener("click", signOut);
 els.refreshReceiptsBtn.addEventListener("click", refreshCloudReceipts);
+document.querySelectorAll(".plan-card").forEach(button => {
+  button.addEventListener("click", handlePlanClick);
+});
 els.historyToggleBtn.addEventListener("click", () => {
   els.historyBox.classList.toggle("show");
   renderHistory();

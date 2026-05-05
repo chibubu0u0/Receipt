@@ -56,6 +56,40 @@
             <button class="btn btn-ghost" id="signOutBtn">登出</button>
           </div>
 
+          <div class="purchase-plans" id="purchasePlans" hidden>
+            <div class="purchase-head">
+              <div>
+                <div class="purchase-title">購買生成次數</div>
+                <div class="purchase-subtitle">付款功能準備中，先確認方案與價格</div>
+              </div>
+            </div>
+
+            <div class="plan-grid">
+              <button class="plan-card" data-plan="starter">
+                <span class="plan-name">小包</span>
+                <strong>10 次</strong>
+                <span class="plan-price">NT$49</span>
+              </button>
+
+              <button class="plan-card recommended" data-plan="standard">
+                <span class="plan-badge">推薦</span>
+                <span class="plan-name">中包</span>
+                <strong>30 次</strong>
+                <span class="plan-price">NT$129</span>
+              </button>
+
+              <button class="plan-card" data-plan="pro">
+                <span class="plan-name">大包</span>
+                <strong>100 次</strong>
+                <span class="plan-price">NT$299</span>
+              </button>
+            </div>
+
+            <div class="purchase-note">
+              之後會接金流，付款成功後自動增加生成次數。
+            </div>
+          </div>
+
           <div class="cloud-receipts" id="cloudReceipts" hidden>
             <div class="cloud-receipts-head">
               <div>
@@ -159,6 +193,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=email-redirect-fix-1"></script>
+  <script src="./app.js?v=pricing-plans-1"></script>
 </body>
 </html>

@@ -172,3 +172,14 @@ options: {
 https://receipt-six-tau.vercel.app
 https://receipt-six-tau.vercel.app/**
 ```
+
+
+## 購買方案介面版本
+
+這版新增「購買生成次數」方案區塊：
+
+- 小包：10 次｜NT$49
+- 中包：30 次｜NT$129
+- 大包：100 次｜NT$299
+
+目前付款功能尚未串接，點擊方案會顯示提示。下一步可以接 TapPay / 綠界 / 藍新付款，付款成功後更新 `user_credits.remaining_credits` 並新增 `credit_logs`。
