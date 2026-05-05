@@ -366,24 +366,14 @@ function renderHistory() {
     return;
   }
 
-  els.historyList.innerHTML = history.map((item, index) => `
-    <button class="history-item" data-index="${index}">
+  // 「最近生成」只做為本機瀏覽紀錄展示，不提供點擊載入。
+  // 可點擊載入的紀錄只保留在登入後的「我的生成紀錄」，且由後端依照目前使用者篩選。
+  els.historyList.innerHTML = history.map(item => `
+    <div class="history-item history-item-static" aria-disabled="true">
       <strong>${escapeHtml(item.song || "Unknown Song")}</strong>
       <span>${escapeHtml(item.artist || "Unknown Artist")}</span>
-    </button>
+    </div>
   `).join("");
-
-  els.historyList.querySelectorAll(".history-item").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const item = getHistory()[Number(btn.dataset.index)];
-      if (!item) return;
-
-      els.artist.value = item.artist || "";
-      els.song.value = item.song || "";
-      renderReceipt(item.data, { artist: item.artist, song: item.song });
-      setStatus("已載入歷史收據。", "ok");
-    });
-  });
 }
 
 
@@ -465,7 +455,7 @@ function setAuthState(session, credits) {
 
   if (!session) {
     els.accountStatus.textContent = "尚未登入｜登入後可領免費 3 次";
-    els.creditPill.textContent = "— 次";
+    els.creditPill.textContent = "0 次";
     els.authForm.hidden = false;
     els.userPanel.hidden = true;
     els.cloudReceipts.hidden = true;
