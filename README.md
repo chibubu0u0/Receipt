@@ -276,40 +276,64 @@ supabase/payment_setup.sql
 - 選中的方案會有高亮效果
 
 
-## LINE Pay Sandbox 串接版
+## PAYUNi UPP 串接版
 
-這版將購買生成次數改成 LINE Pay Sandbox 流程。
+這版將購買生成次數改成 PAYUNi UNiPaypage（UPP）整合式支付頁流程。
 
-### 新增 / 修改 API
+### 新增 / 修改
 
 - `/api/create-purchase-order`
   - 建立 `purchase_orders`
-  - 呼叫 LINE Pay `/v3/payments/request`
-  - 回傳 LINE Pay 付款網址給前端
+  - 依 PAYUNi SDK 流程產生 `EncryptInfo`
+  - 產生 `HashInfo`
+  - 回傳 PAYUNi UPP 表單資料給前端
 
-- `/api/linepay-confirm`
-  - LINE Pay 驗證完成後會導回這裡
-  - 後端呼叫 LINE Pay `/v3/payments/{transactionId}/confirm`
-  - confirm 成功後增加生成次數、寫入 `payments`、寫入 `credit_logs`
+- `/api/payuni-notify`
+  - 接收 PAYUNi NotifyURL
+  - 驗證 `HashInfo`
+  - 解密 `EncryptInfo`
+  - 若 `Status=SUCCESS` 且 `TradeStatus=1`，自動加生成次數
+
+- `/api/payuni-return`
+  - 接收 PAYUNi ReturnURL
+  - 付款後導回網站
+  - 顯示成功 / 待付款 / 失敗狀態
 
 ### Vercel Environment Variables
 
-請新增：
+請在 Vercel 設定：
 
 ```txt
-LINE_PAY_CHANNEL_ID=你的 LINE Pay Sandbox Channel ID
-LINE_PAY_CHANNEL_SECRET=你的 LINE Pay Sandbox Channel Secret
-LINE_PAY_API_BASE_URL=https://sandbox-api-pay.line.me
+PAYUNI_MERCHANT_ID=你的商店代號
+PAYUNI_HASH_KEY=你的 Hash Key
+PAYUNI_IV_KEY=你的 IV Key
+PAYUNI_API_BASE_URL=https://sandbox-api.payuni.com.tw/api
 ```
 
-正式環境時改成：
+正式環境通常改成：
 
 ```txt
-LINE_PAY_API_BASE_URL=https://api-pay.line.me
+PAYUNI_API_BASE_URL=https://api.payuni.com.tw/api
 ```
 
-並且換成正式 Merchant 的 Channel ID / Channel Secret。
+並換成正式商店的 Merchant ID / Hash Key / IV Key。
 
-### 重要提醒
+### PAYUNi 後台要設定
 
-LINE Pay Online API v3 需要在 request 後將使用者導向 LINE Pay 付款頁；使用者完成驗證後，你的後端必須呼叫 Confirm API，付款才會真正完成並加點。
+請到 PAYUNi 後台的商店串接設定，設定：
+
+```txt
+NotifyURL=https://你的網域/api/payuni-notify
+ReturnURL=https://你的網域/api/payuni-return
+```
+
+如果使用目前 Vercel 網域，可設定：
+
+```txt
+https://receipt-six-tau.vercel.app/api/payuni-notify
+https://receipt-six-tau.vercel.app/api/payuni-return
+```
+
+### 注意
+
+這版以 PAYUNi 官方 PHP SDK 的 UPP 流程轉成 Vercel / Node.js 實作。若你的 PAYUNi 帳號 API 文件要求額外欄位，請以 PAYUNi 後台或官方文件為準。
