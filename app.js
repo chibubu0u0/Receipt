@@ -1,20 +1,6 @@
-const OPENAI_MODEL = "gpt-4.1-mini";
-
-/*
-  只建議自己本機使用：
-  你可以把 API Key 貼在下方引號內，也可以直接在網頁欄位輸入。
-
-  更安全的正式做法：
-  之後上線時，建議改成後端代理，不要把 API Key 放在前端。
-*/
-const OPENAI_API_KEY = "";
-
-const STORAGE_KEY = "songReceiptStudioKey";
 const HISTORY_KEY = "songReceiptStudioHistory";
 
 const els = {
-  apiKey: document.getElementById("apiKey"),
-  rememberKey: document.getElementById("rememberKey"),
   artist: document.getElementById("artist"),
   song: document.getElementById("song"),
   listenerNote: document.getElementById("listenerNote"),
@@ -88,105 +74,8 @@ const demoData = {
   vibe: "餘溫還沒散"
 };
 
-const schema = {
-  type: "object",
-  additionalProperties: false,
-  required: ["soul", "tagline", "emotions", "colors", "melody", "objects", "items", "closing", "vibe"],
-  properties: {
-    soul: { type: "string" },
-    tagline: { type: "string" },
-    emotions: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["icon", "name", "label", "value"],
-        properties: {
-          icon: { type: "string", enum: ["moon", "star", "heart", "sun", "cloud", "eye", "wave", "drop", "wind", "mountain", "clock", "ghost", "music", "circle"] },
-          name: { type: "string" },
-          label: { type: "string" },
-          value: { type: "number" }
-        }
-      }
-    },
-    colors: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["hex", "name"],
-        properties: { hex: { type: "string" }, name: { type: "string" } }
-      }
-    },
-    melody: {
-      type: "object",
-      additionalProperties: false,
-      required: ["contour", "sections", "label"],
-      properties: {
-        contour: { type: "array", items: { type: "number" } },
-        sections: { type: "array", items: { type: "string" } },
-        label: { type: "string" }
-      }
-    },
-    objects: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["name", "meaning"],
-        properties: { name: { type: "string" }, meaning: { type: "string" } }
-      }
-    },
-    items: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["name", "intensity"],
-        properties: {
-          name: { type: "string" },
-          intensity: { type: "number" }
-        }
-      }
-    },
-    closing: { type: "string" },
-    vibe: { type: "string" }
-  }
-};
-
 let currentDepth = "standard";
 let currentData = demoData;
-
-function buildInstructions(depth, note) {
-  const depthRule = {
-    standard: "分析清楚、詩意但不要過度艱澀，適合一般社群分享。",
-    deep: "請更深一層：加入具體場景、心理狀態、聽覺動態與可視化物件，像品牌企劃在設計一張情緒商品小票。",
-    director: "請像音樂錄影帶導演與藝術總監：文字更有畫面，色彩更精準，物件更像可以拍成一張劇照。"
-  }[depth] || "分析清楚、詩意但不要過度艱澀。";
-
-  return `你是一位結合音樂評論家、品牌藝術總監與唱片行店員的創作顧問。
-任務：把用戶提供的歌手與歌曲，轉換成一張「AI 情感收據」所需的 JSON。
-
-重要限制：
-- 不要引用或改寫任何完整歌詞。可以描述情緒、聲音、氛圍與可推測的畫面。
-- 如果你不確定冷門歌曲的完整資料，根據歌手風格、曲名語意與可推測的音樂情緒生成，但不要假裝知道不存在的細節。
-- 只回傳 JSON，不要 markdown，不要解釋。
-
-本次深度規則：${depthRule}
-用戶補充語氣：${note || "無"}
-
-欄位寫作規則：
-- soul：2 到 3 句，每句都要有具體場景、動作或感官細節。
-- tagline：12 字以內，像唱片行牆上的一句標語。
-- emotions：4 個，name 要具體有畫面，label 2-4 字，value 0-100。
-- colors：3 個，hex 合法，name 不要只說顏色，要像詩意色名。
-- melody.contour：20 個左右 0-100 的數字，反映歌曲情感動態，不要全部平。
-- melody.sections：5-7 個繁體中文段落名。
-- objects：3 個「歌曲具現化」的元素，像 MV 道具、記憶物件、場景符號，搭配它代表的情緒意義。
-- items：3-5 個心情結帳項目，name 是情緒商品，intensity 一律是 0-100 的數字，代表情緒強度。不要輸出 qty，數量會由系統依照強度自動換算，確保數量與強度呈正比。
-- closing：一句給聽眾的短短建議。
-- vibe：10 字以內，核心氛圍。`;
-}
 
 function setStatus(message, type = "") {
   els.status.textContent = message;
@@ -482,94 +371,52 @@ function renderHistory() {
 }
 
 async function generateReceipt() {
-  const apiKey = OPENAI_API_KEY.trim() || els.apiKey.value.trim();
   const artist = els.artist.value.trim();
   const song = els.song.value.trim();
   const note = els.listenerNote.value.trim();
   const nl = String.fromCharCode(10);
-
-  if (!apiKey) {
-    setStatus("請先輸入 OpenAI API Key。", "error");
-    return;
-  }
 
   if (!artist || !song) {
     setStatus("請輸入歌手與歌名。", "error");
     return;
   }
 
-  if (els.rememberKey.checked) localStorage.setItem(STORAGE_KEY, apiKey);
-  else localStorage.removeItem(STORAGE_KEY);
-
   setStatus("分析中：正在把歌曲拆成情緒、色彩、物件與收據明細…");
   els.generateBtn.disabled = true;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: OPENAI_MODEL,
-        instructions: buildInstructions(currentDepth, note),
-        input: `請分析：歌手「${artist}」，歌曲「${song}」。`,
-        temperature: currentDepth === "director" ? 0.98 : 0.88,
-        max_output_tokens: 2200,
-        store: false,
-        text: {
-          format: {
-            type: "json_schema",
-            name: "song_receipt_studio",
-            strict: true,
-            schema
-          }
-        }
+        artist,
+        song,
+        note,
+        depth: currentDepth
       })
     });
 
-    const rawText = await response.text();
-    let result = null;
-
-    try {
-      result = JSON.parse(rawText);
-    } catch {
-      result = null;
-    }
+    const result = await response.json().catch(() => null);
 
     if (!response.ok) {
-      const apiMessage = result && result.error && result.error.message ? result.error.message : rawText.slice(0, 240);
-
-      if (response.status === 429 && /quota|billing|exceeded/i.test(apiMessage)) {
-        throw new Error(`你的 OpenAI API 目前沒有可用額度，或尚未完成 API 付款設定。${nl}請檢查 Billing、Usage、Project 與付款方式。`);
-      }
-
-      if (response.status === 401) {
-        throw new Error(`OpenAI API Key 無效或已失效。${nl}請重新建立 API Key 後再貼上。`);
-      }
-
-      throw new Error(`OpenAI API 回應失敗：${response.status}${nl}${apiMessage || "未知錯誤"}`);
+      const message = result && result.error ? result.error : `後端 API 回應失敗：${response.status}`;
+      throw new Error(message);
     }
 
-    const outputText = result.output_text || (Array.isArray(result.output)
-      ? result.output.flatMap(item => item.content || []).map(part => part.text || "").join(nl)
-      : "");
-
-    if (!outputText.trim()) {
-      throw new Error("AI 沒有回傳可解析內容。請換一首歌或稍後再試。");
+    if (!result || !result.data) {
+      throw new Error("後端沒有回傳可解析內容。請稍後再試。");
     }
 
-    const parsed = JSON.parse(outputText);
-    const normalized = normalizeData(parsed);
+    const normalized = normalizeData(result.data);
 
     renderReceipt(normalized, { artist, song });
     saveHistory({ artist, song, data: normalized, createdAt: new Date().toISOString() });
     setStatus("完成。這張收據已升級成可收藏版本。", "ok");
   } catch (error) {
     console.error(error);
-    const blockedHint = error instanceof TypeError ? `${nl}如果瀏覽器阻擋請求，請用 VSCode Live Server 或本機伺服器開啟 HTML。` : "";
-    setStatus(`${error.message || "產生失敗，請確認 API Key 或網路狀態。"}${blockedHint}`, "error");
+    setStatus(`${error.message || "產生失敗，請確認後端 API 或網路狀態。"}${nl}如果剛設定完 Vercel 環境變數，請重新部署一次。`, "error");
   } finally {
     els.generateBtn.disabled = false;
   }
@@ -680,15 +527,4 @@ els.themeSelect.addEventListener("change", () => {
 
 els.sizeSelect.addEventListener("change", applySize);
 
-const savedApiKey = localStorage.getItem(STORAGE_KEY);
-
-if (savedApiKey && !OPENAI_API_KEY.trim()) {
-  els.apiKey.value = savedApiKey;
-  els.rememberKey.checked = true;
-  setStatus("已從這台瀏覽器自動帶入 API Key。", "ok");
-}
-
-applyTheme();
-applySize();
-renderHistory();
 renderReceipt(demoData, { artist: "Demo Artist", song: "Demo Song" });
