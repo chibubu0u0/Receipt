@@ -913,6 +913,28 @@ function dataUrlToFile(dataUrl, filename) {
   return new File([u8arr], filename, { type: mime });
 }
 
+function isMobileDevice() {
+  return /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent);
+}
+
+async function forceDownloadPng(dataUrl, filename) {
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
+  const blobUrl = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = blobUrl;
+  link.download = filename;
+  link.rel = "noopener";
+  link.style.display = "none";
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+}
+
 async function downloadPng() {
   if (!window.htmlToImage) {
     setStatus("圖片輸出套件尚未載入完成，請確認網路後重新整理。", "error");
@@ -931,6 +953,16 @@ async function downloadPng() {
     });
 
     const filename = `song-receipt-${Date.now()}.png`;
+
+    // 電腦版強制使用 Blob 下載，不走 Web Share API。
+    // 比 data URL 更穩，尤其是 macOS Safari / Chrome。
+    if (!isMobileDevice()) {
+      await forceDownloadPng(dataUrl, filename);
+      setStatus("PNG 已直接下載。", "ok");
+      return;
+    }
+
+    // 手機版保留分享 / 儲存體驗。
     const file = dataUrlToFile(dataUrl, filename);
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -939,14 +971,11 @@ async function downloadPng() {
       return;
     }
 
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (isMobile) {
-      els.saveImage.src = dataUrl;
-      els.savePanelText.textContent = "圖片已產生。請長按圖片，選擇「儲存到照片」或「加入照片」。";
-      els.savePanel.classList.add("show");
-      els.savePanel.scrollIntoView({ behavior: "smooth", block: "center" });
-      setStatus("圖片已顯示在下方。", "ok");
+    els.saveImage.src = dataUrl;
+    els.savePanelText.textContent = "圖片已產生。請長按圖片，選擇「儲存到照片」或「加入照片」。";
+    els.savePanel.classList.add("show");
+    els.savePanel.scrollIntoView({ behavior: "smooth", block: "center" });
+    setStatus("圖片已顯示在下方。", "ok");
       return;
     }
 

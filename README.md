@@ -389,3 +389,13 @@ computedUppAction = https://sandbox-api.payuni.com.tw/api/upp
 
 - 電腦版：按「下載 / 分享 PNG」會直接下載 PNG，不再開啟系統分享選單
 - 手機版：保留分享選單；如果瀏覽器不支援分享，會顯示圖片讓使用者長按儲存
+
+
+## 電腦版 Blob 直接下載修正
+
+這版再次強化電腦版 PNG 下載：
+
+- 電腦版完全不呼叫 Web Share API
+- 改用 Blob URL 下載，比 data URL 更穩
+- 手機版仍保留系統分享選單
+- `app.js` 版本改為 `desktop-blob-download-2`，避免瀏覽器吃到舊快取
