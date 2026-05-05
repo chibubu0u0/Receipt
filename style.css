@@ -693,6 +693,79 @@ h1 {
   user-select: auto;
 }
 
+
+.account-card {
+  margin: 18px 0 22px;
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(235,226,210,.12);
+  background: rgba(235,226,210,.065);
+}
+
+.account-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.account-title {
+  color: var(--cream);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: .04em;
+}
+
+.account-subtitle {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.credit-pill {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: #17140f;
+  background: var(--cream);
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 10px;
+}
+
+.small-actions {
+  margin-top: 4px;
+}
+
+.user-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.user-panel span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.buy-placeholder {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 @media (max-width: 980px) {
   .layout { grid-template-columns: 1fr; }
   .control-panel { position: static; }

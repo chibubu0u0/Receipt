@@ -14,6 +14,16 @@ const els = {
   status: document.getElementById("status"),
   historyBox: document.getElementById("historyBox"),
   historyList: document.getElementById("historyList"),
+  accountStatus: document.getElementById("accountStatus"),
+  creditPill: document.getElementById("creditPill"),
+  authForm: document.getElementById("authForm"),
+  authEmail: document.getElementById("authEmail"),
+  authPassword: document.getElementById("authPassword"),
+  signInBtn: document.getElementById("signInBtn"),
+  signUpBtn: document.getElementById("signUpBtn"),
+  signOutBtn: document.getElementById("signOutBtn"),
+  userPanel: document.getElementById("userPanel"),
+  userEmail: document.getElementById("userEmail"),
   receipt: document.getElementById("receipt"),
   receiptSong: document.getElementById("receiptSong"),
   receiptArtist: document.getElementById("receiptArtist"),
@@ -76,6 +86,9 @@ const demoData = {
 
 let currentDepth = "standard";
 let currentData = demoData;
+let supabaseClient = null;
+let currentSession = null;
+let currentCredits = null;
 
 function setStatus(message, type = "") {
   els.status.textContent = message;
@@ -370,14 +383,159 @@ function renderHistory() {
   });
 }
 
+
+async function initAuth() {
+  try {
+    const configResponse = await fetch("/api/config");
+    const config = await configResponse.json();
+
+    if (!configResponse.ok || !config.supabaseUrl || !config.supabaseAnonKey) {
+      setAuthState(null, null);
+      setStatus(config.error || "尚未設定 Supabase 環境變數。", "error");
+      return;
+    }
+
+    supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+
+    const { data } = await supabaseClient.auth.getSession();
+    currentSession = data.session || null;
+    await refreshAccount();
+
+    supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+      currentSession = session || null;
+      await refreshAccount();
+    });
+  } catch (error) {
+    console.error(error);
+    setStatus("會員系統初始化失敗，請檢查 Supabase 設定。", "error");
+  }
+}
+
+function setAuthState(session, credits) {
+  currentSession = session;
+  currentCredits = credits;
+
+  if (!session) {
+    els.accountStatus.textContent = "尚未登入｜登入後可領免費 3 次";
+    els.creditPill.textContent = "— 次";
+    els.authForm.hidden = false;
+    els.userPanel.hidden = true;
+    els.userEmail.textContent = "—";
+    return;
+  }
+
+  const email = session.user && session.user.email ? session.user.email : "已登入";
+  els.accountStatus.textContent = "已登入｜每次生成會扣 1 次";
+  els.creditPill.textContent = `${credits ?? 0} 次`;
+  els.authForm.hidden = true;
+  els.userPanel.hidden = false;
+  els.userEmail.textContent = email;
+}
+
+async function refreshAccount() {
+  if (!currentSession) {
+    setAuthState(null, null);
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/me", {
+      headers: {
+        "Authorization": `Bearer ${currentSession.access_token}`
+      }
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(result && result.error ? result.error : "讀取會員資料失敗。");
+    }
+
+    setAuthState(currentSession, result.remainingCredits);
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message || "讀取會員資料失敗。", "error");
+  }
+}
+
+async function signUp() {
+  if (!supabaseClient) {
+    setStatus("會員系統尚未初始化。", "error");
+    return;
+  }
+
+  const email = els.authEmail.value.trim();
+  const password = els.authPassword.value;
+
+  if (!email || !password) {
+    setStatus("請輸入 Email 與密碼。", "error");
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signUp({ email, password });
+
+  if (error) {
+    setStatus(error.message, "error");
+    return;
+  }
+
+  setStatus("註冊完成。如果 Supabase 開啟 Email 確認，請先到信箱確認後再登入。", "ok");
+}
+
+async function signIn() {
+  if (!supabaseClient) {
+    setStatus("會員系統尚未初始化。", "error");
+    return;
+  }
+
+  const email = els.authEmail.value.trim();
+  const password = els.authPassword.value;
+
+  if (!email || !password) {
+    setStatus("請輸入 Email 與密碼。", "error");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    setStatus(error.message, "error");
+    return;
+  }
+
+  currentSession = data.session;
+  await refreshAccount();
+  setStatus("登入成功。", "ok");
+}
+
+async function signOut() {
+  if (!supabaseClient) return;
+
+  await supabaseClient.auth.signOut();
+  currentSession = null;
+  setAuthState(null, null);
+  setStatus("已登出。", "ok");
+}
+
+
 async function generateReceipt() {
   const artist = els.artist.value.trim();
   const song = els.song.value.trim();
   const note = els.listenerNote.value.trim();
   const nl = String.fromCharCode(10);
 
+  if (!currentSession) {
+    setStatus("請先登入，才能使用生成次數。", "error");
+    return;
+  }
+
   if (!artist || !song) {
     setStatus("請輸入歌手與歌名。", "error");
+    return;
+  }
+
+  if (currentCredits !== null && currentCredits <= 0) {
+    setStatus("你的生成次數已用完。下一步可以接付款系統來購買次數。", "error");
     return;
   }
 
@@ -388,7 +546,8 @@ async function generateReceipt() {
     const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${currentSession.access_token}`
       },
       body: JSON.stringify({
         artist,
@@ -413,7 +572,12 @@ async function generateReceipt() {
 
     renderReceipt(normalized, { artist, song });
     saveHistory({ artist, song, data: normalized, createdAt: new Date().toISOString() });
-    setStatus("完成。這張收據已升級成可收藏版本。", "ok");
+
+    if (typeof result.remainingCredits === "number") {
+      setAuthState(currentSession, result.remainingCredits);
+    }
+
+    setStatus("完成。已扣除 1 次生成次數。", "ok");
   } catch (error) {
     console.error(error);
     setStatus(`${error.message || "產生失敗，請確認後端 API 或網路狀態。"}${nl}如果剛設定完 Vercel 環境變數，請重新部署一次。`, "error");
@@ -515,6 +679,9 @@ els.generateBtn.addEventListener("click", generateReceipt);
 els.demoBtn.addEventListener("click", loadDemo);
 els.downloadBtn.addEventListener("click", downloadPng);
 els.resetBtn.addEventListener("click", resetApp);
+els.signInBtn.addEventListener("click", signIn);
+els.signUpBtn.addEventListener("click", signUp);
+els.signOutBtn.addEventListener("click", signOut);
 els.historyToggleBtn.addEventListener("click", () => {
   els.historyBox.classList.toggle("show");
   renderHistory();

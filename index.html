@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Song Receipt Studio｜AI 情感收據生成器</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -23,6 +24,39 @@
         <p class="hero-copy">
           進化版會把歌曲拆成情緒、歌曲具現化、色彩、旋律曲線與「心情結帳」。不是只分析歌曲，而是把一首歌做成一張可以分享的情感商品小票。
         </p>
+
+        <div class="account-card" id="accountCard">
+          <div class="account-head">
+            <div>
+              <div class="account-title">會員與生成次數</div>
+              <div class="account-subtitle" id="accountStatus">尚未登入</div>
+            </div>
+            <div class="credit-pill" id="creditPill">— 次</div>
+          </div>
+
+          <div class="auth-form" id="authForm">
+            <div class="row">
+              <div class="field">
+                <label for="authEmail">Email</label>
+                <input id="authEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+              </div>
+              <div class="field">
+                <label for="authPassword">密碼</label>
+                <input id="authPassword" type="password" placeholder="至少 6 個字元" autocomplete="current-password" />
+              </div>
+            </div>
+            <div class="actions small-actions">
+              <button class="btn btn-secondary" id="signInBtn">登入</button>
+              <button class="btn btn-ghost" id="signUpBtn">註冊並領 3 次</button>
+            </div>
+          </div>
+
+          <div class="user-panel" id="userPanel" hidden>
+            <span id="userEmail">—</span>
+            <button class="btn btn-ghost" id="signOutBtn">登出</button>
+          </div>
+        </div>
+
 
         <div class="tabs" aria-label="分析模式">
           <button class="tab active" data-depth="standard">標準分析</button>
