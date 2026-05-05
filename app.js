@@ -384,6 +384,50 @@ function renderHistory() {
 }
 
 
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const existed = Array.from(document.scripts).some(script => script.src === src);
+    if (existed) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = false;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error(`無法載入 ${src}`));
+    document.head.appendChild(script);
+  });
+}
+
+async function loadSupabaseSdk() {
+  if (window.supabase && typeof window.supabase.createClient === "function") {
+    return window.supabase;
+  }
+
+  const cdnList = [
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+    "https://unpkg.com/@supabase/supabase-js@2"
+  ];
+
+  for (const src of cdnList) {
+    try {
+      await loadScript(src);
+
+      if (window.supabase && typeof window.supabase.createClient === "function") {
+        return window.supabase;
+      }
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+
+  throw new Error("Supabase SDK 載入失敗。請確認瀏覽器沒有封鎖 jsDelivr / unpkg，或稍後再試。");
+}
+
+
 async function initAuth() {
   try {
     const configResponse = await fetch("/api/config");
@@ -395,7 +439,8 @@ async function initAuth() {
       return;
     }
 
-    supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+    const supabaseSdk = await loadSupabaseSdk();
+    supabaseClient = supabaseSdk.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
     const { data } = await supabaseClient.auth.getSession();
     currentSession = data.session || null;
@@ -407,7 +452,7 @@ async function initAuth() {
     });
   } catch (error) {
     console.error(error);
-    setStatus("會員系統初始化失敗，請檢查 Supabase 設定。", "error");
+    setStatus(error.message || "會員系統初始化失敗，請檢查 Supabase 設定。", "error");
   }
 }
 
@@ -460,7 +505,11 @@ async function refreshAccount() {
 
 async function signUp() {
   if (!supabaseClient) {
-    setStatus("會員系統尚未初始化。", "error");
+    await initAuth();
+  }
+
+  if (!supabaseClient) {
+    setStatus("會員系統尚未初始化。請強制重新整理，或確認 Supabase SDK 沒有被瀏覽器封鎖。", "error");
     return;
   }
 
@@ -484,7 +533,11 @@ async function signUp() {
 
 async function signIn() {
   if (!supabaseClient) {
-    setStatus("會員系統尚未初始化。", "error");
+    await initAuth();
+  }
+
+  if (!supabaseClient) {
+    setStatus("會員系統尚未初始化。請強制重新整理，或確認 Supabase SDK 沒有被瀏覽器封鎖。", "error");
     return;
   }
 

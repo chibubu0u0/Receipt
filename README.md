@@ -119,3 +119,12 @@ OPENAI_MODEL=gpt-4.1-mini
 - `SUPABASE_SERVICE_ROLE_KEY` 絕對不要放在前端，只能放 Vercel Environment Variables。
 - 目前扣點是 MVP 寫法，正式大量使用前建議改成 Supabase RPC / database function，避免多人同時請求時產生競態問題。
 - 付款功能尚未接入，下一步可以串 TapPay / 綠界 / 藍新，付款成功後新增 credit log 並增加 `user_credits.remaining_credits`。
+
+
+## 會員初始化修正
+
+這版加入：
+
+- `app.js?v=member-init-fix-1` 版本參數，避免瀏覽器讀到舊快取
+- Supabase SDK 載入 fallback：jsDelivr 失敗時會改用 unpkg
+- 登入 / 註冊時如果尚未初始化，會再嘗試初始化一次
