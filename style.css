@@ -766,6 +766,75 @@ h1 {
   line-height: 1.55;
 }
 
+
+.cloud-receipts {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(235,226,210,.14);
+}
+
+.cloud-receipts-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.cloud-receipts-title {
+  color: var(--cream);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: .04em;
+}
+
+.cloud-receipts-subtitle,
+.cloud-empty {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.mini-btn {
+  padding: 8px 11px;
+  font-size: 11px;
+}
+
+.cloud-receipt-list {
+  display: grid;
+  gap: 8px;
+}
+
+.cloud-receipt-item {
+  width: 100%;
+  border: 1px solid rgba(235,226,210,.1);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: rgba(0,0,0,.14);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+}
+
+.cloud-receipt-item strong {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.cloud-receipt-item span {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.cloud-receipt-date {
+  color: rgba(235,226,210,.55) !important;
+  font-size: 10px !important;
+}
+
 @media (max-width: 980px) {
   .layout { grid-template-columns: 1fr; }
   .control-panel { position: static; }

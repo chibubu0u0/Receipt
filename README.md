@@ -128,3 +128,13 @@ OPENAI_MODEL=gpt-4.1-mini
 - `app.js?v=member-init-fix-1` 版本參數，避免瀏覽器讀到舊快取
 - Supabase SDK 載入 fallback：jsDelivr 失敗時會改用 unpkg
 - 登入 / 註冊時如果尚未初始化，會再嘗試初始化一次
+
+
+## 我的生成紀錄版本
+
+這版新增：
+
+- 登入後顯示「我的生成紀錄」
+- 從 Supabase `receipts` 讀取最近 10 筆生成紀錄
+- 點擊紀錄可以重新載入該張收據
+- 新增 `/api/receipts` 後端 API

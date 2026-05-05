@@ -24,6 +24,9 @@ const els = {
   signOutBtn: document.getElementById("signOutBtn"),
   userPanel: document.getElementById("userPanel"),
   userEmail: document.getElementById("userEmail"),
+  cloudReceipts: document.getElementById("cloudReceipts"),
+  cloudReceiptList: document.getElementById("cloudReceiptList"),
+  refreshReceiptsBtn: document.getElementById("refreshReceiptsBtn"),
   receipt: document.getElementById("receipt"),
   receiptSong: document.getElementById("receiptSong"),
   receiptArtist: document.getElementById("receiptArtist"),
@@ -465,6 +468,7 @@ function setAuthState(session, credits) {
     els.creditPill.textContent = "— 次";
     els.authForm.hidden = false;
     els.userPanel.hidden = true;
+    els.cloudReceipts.hidden = true;
     els.userEmail.textContent = "—";
     return;
   }
@@ -474,6 +478,7 @@ function setAuthState(session, credits) {
   els.creditPill.textContent = `${credits ?? 0} 次`;
   els.authForm.hidden = true;
   els.userPanel.hidden = false;
+  els.cloudReceipts.hidden = false;
   els.userEmail.textContent = email;
 }
 
@@ -497,11 +502,81 @@ async function refreshAccount() {
     }
 
     setAuthState(currentSession, result.remainingCredits);
+    await refreshCloudReceipts();
   } catch (error) {
     console.error(error);
     setStatus(error.message || "讀取會員資料失敗。", "error");
   }
 }
+
+
+function formatReceiptDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleString("zh-Hant", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+async function refreshCloudReceipts() {
+  if (!currentSession) {
+    els.cloudReceiptList.innerHTML = `<div class="cloud-empty">登入後會顯示你的生成紀錄。</div>`;
+    return;
+  }
+
+  els.cloudReceiptList.innerHTML = `<div class="cloud-empty">讀取生成紀錄中…</div>`;
+
+  try {
+    const response = await fetch("/api/receipts", {
+      headers: {
+        "Authorization": `Bearer ${currentSession.access_token}`
+      }
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(result && result.error ? result.error : "讀取生成紀錄失敗。");
+    }
+
+    const receipts = Array.isArray(result.receipts) ? result.receipts : [];
+
+    if (!receipts.length) {
+      els.cloudReceiptList.innerHTML = `<div class="cloud-empty">尚無生成紀錄。</div>`;
+      return;
+    }
+
+    els.cloudReceiptList.innerHTML = receipts.map((item, index) => `
+      <button class="cloud-receipt-item" data-index="${index}">
+        <strong>${escapeHtml(item.song || "Unknown Song")}</strong>
+        <span>${escapeHtml(item.artist || "Unknown Artist")}</span>
+        <span class="cloud-receipt-date">${escapeHtml(formatReceiptDate(item.created_at))}</span>
+      </button>
+    `).join("");
+
+    els.cloudReceiptList.querySelectorAll(".cloud-receipt-item").forEach(button => {
+      button.addEventListener("click", () => {
+        const item = receipts[Number(button.dataset.index)];
+        if (!item) return;
+
+        els.artist.value = item.artist || "";
+        els.song.value = item.song || "";
+        renderReceipt(item.result_json, { artist: item.artist, song: item.song });
+        setStatus("已載入雲端生成紀錄。", "ok");
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    els.cloudReceiptList.innerHTML = `<div class="cloud-empty">${escapeHtml(error.message || "讀取生成紀錄失敗。")}</div>`;
+  }
+}
+
 
 async function signUp() {
   if (!supabaseClient) {
@@ -628,8 +703,10 @@ async function generateReceipt() {
 
     if (typeof result.remainingCredits === "number") {
       setAuthState(currentSession, result.remainingCredits);
+    await refreshCloudReceipts();
     }
 
+    await refreshCloudReceipts();
     setStatus("完成。已扣除 1 次生成次數。", "ok");
   } catch (error) {
     console.error(error);
@@ -735,6 +812,7 @@ els.resetBtn.addEventListener("click", resetApp);
 els.signInBtn.addEventListener("click", signIn);
 els.signUpBtn.addEventListener("click", signUp);
 els.signOutBtn.addEventListener("click", signOut);
+els.refreshReceiptsBtn.addEventListener("click", refreshCloudReceipts);
 els.historyToggleBtn.addEventListener("click", () => {
   els.historyBox.classList.toggle("show");
   renderHistory();

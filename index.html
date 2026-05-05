@@ -55,6 +55,19 @@
             <span id="userEmail">—</span>
             <button class="btn btn-ghost" id="signOutBtn">登出</button>
           </div>
+
+          <div class="cloud-receipts" id="cloudReceipts" hidden>
+            <div class="cloud-receipts-head">
+              <div>
+                <div class="cloud-receipts-title">我的生成紀錄</div>
+                <div class="cloud-receipts-subtitle">登入後會顯示最近 10 張收據</div>
+              </div>
+              <button class="btn btn-ghost mini-btn" id="refreshReceiptsBtn">重新整理</button>
+            </div>
+            <div class="cloud-receipt-list" id="cloudReceiptList">
+              <div class="cloud-empty">尚無生成紀錄。</div>
+            </div>
+          </div>
         </div>
 
 
@@ -146,6 +159,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=member-init-fix-1"></script>
+  <script src="./app.js?v=my-receipts-1"></script>
 </body>
 </html>
