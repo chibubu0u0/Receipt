@@ -627,7 +627,7 @@ async function confirmPurchaseOrder() {
       throw new Error(result && result.error ? result.error : "建立訂單失敗。");
     }
 
-    setStatus(`已建立訂單 #${result.order.id}：${plan.label} ${plan.credits} 次 / NT$${plan.price}。下一步接金流後，會導向付款頁。`, "ok");
+    setStatus(`已建立待付款訂單 #${result.order.id}：${plan.label} ${plan.credits} 次 / NT$${plan.price}。付款完成後才會增加生成次數。`, "ok");
   } catch (error) {
     console.error(error);
     setStatus(error.message || "建立訂單失敗。", "error");
