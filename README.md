@@ -217,3 +217,50 @@ ADMIN_EMAILS=you@example.com,partner@example.com
 ```
 
 設定完後請重新 Redeploy。
+
+
+## 付款訂單架構版本
+
+這版新增付款前置架構：
+
+### 新增資料表
+
+請到 Supabase SQL Editor 執行：
+
+```txt
+supabase/payment_setup.sql
+```
+
+會建立：
+
+- `purchase_orders`：購買訂單
+- `payments`：付款紀錄
+
+### 新增 API
+
+- `/api/create-purchase-order`
+  - 登入者點選方案後建立 pending 訂單
+  - 目前不導向付款頁，之後接 TapPay / 綠界 / 藍新時使用
+
+- `/api/mark-order-paid-test`
+  - 管理員測試用
+  - 傳入 orderId 後，會把 pending 訂單改成 paid，並增加對應生成次數
+  - 正式上線前可保留管理員限制，或改成金流 webhook 專用流程
+
+### 目前方案
+
+- starter：10 次｜NT$49
+- standard：30 次｜NT$129
+- pro：100 次｜NT$299
+
+### 下一步接金流時的流程
+
+1. 使用者點方案，建立 `purchase_orders`
+2. 後端向金流建立付款請求
+3. 使用者完成付款
+4. 金流 webhook 通知你的後端
+5. 後端驗證簽章與金額
+6. 寫入 `payments`
+7. 更新 `purchase_orders.status = paid`
+8. 增加 `user_credits.remaining_credits`
+9. 寫入 `credit_logs`

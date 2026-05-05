@@ -567,9 +567,10 @@ const CREDIT_PLANS = {
   pro: { credits: 100, price: 299, label: "大包" }
 };
 
-function handlePlanClick(event) {
+async function handlePlanClick(event) {
   const button = event.currentTarget;
-  const plan = CREDIT_PLANS[button.dataset.plan];
+  const planId = button.dataset.plan;
+  const plan = CREDIT_PLANS[planId];
 
   if (!plan) return;
 
@@ -578,7 +579,32 @@ function handlePlanClick(event) {
     return;
   }
 
-  setStatus(`${plan.label}：${plan.credits} 次 / NT$${plan.price}。付款功能尚未串接，下一步會接 TapPay / 綠界 / 藍新。`, "ok");
+  button.disabled = true;
+  setStatus("正在建立付款訂單…");
+
+  try {
+    const response = await fetch("/api/create-purchase-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${currentSession.access_token}`
+      },
+      body: JSON.stringify({ planId })
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(result && result.error ? result.error : "建立訂單失敗。");
+    }
+
+    setStatus(`已建立訂單 #${result.order.id}：${plan.label} ${plan.credits} 次 / NT$${plan.price}。下一步接金流後，會導向付款頁。`, "ok");
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message || "建立訂單失敗。", "error");
+  } finally {
+    button.disabled = false;
+  }
 }
 
 
