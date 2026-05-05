@@ -27,6 +27,8 @@ const els = {
   cloudReceipts: document.getElementById("cloudReceipts"),
   purchasePlans: document.getElementById("purchasePlans"),
   purchaseToggleBtn: document.getElementById("purchaseToggleBtn"),
+  adminTestPanel: document.getElementById("adminTestPanel"),
+  testAddCreditsBtn: document.getElementById("testAddCreditsBtn"),
   cloudReceiptList: document.getElementById("cloudReceiptList"),
   refreshReceiptsBtn: document.getElementById("refreshReceiptsBtn"),
   receipt: document.getElementById("receipt"),
@@ -94,6 +96,7 @@ let currentData = demoData;
 let supabaseClient = null;
 let currentSession = null;
 let currentCredits = null;
+let currentIsAdmin = false;
 
 function setStatus(message, type = "") {
   els.status.textContent = message;
@@ -461,6 +464,7 @@ function setAuthState(session, credits) {
     els.authForm.hidden = false;
     els.userPanel.hidden = true;
     els.purchasePlans.hidden = true;
+    els.adminTestPanel.hidden = true;
     els.cloudReceipts.hidden = true;
     els.userEmail.textContent = "—";
     return;
@@ -472,6 +476,7 @@ function setAuthState(session, credits) {
   els.authForm.hidden = true;
   els.userPanel.hidden = false;
   els.purchasePlans.hidden = false;
+  els.adminTestPanel.hidden = !currentIsAdmin;
   els.cloudReceipts.hidden = false;
   els.userEmail.textContent = email;
 }
@@ -495,6 +500,7 @@ async function refreshAccount() {
       throw new Error(result && result.error ? result.error : "讀取會員資料失敗。");
     }
 
+    currentIsAdmin = Boolean(result.isAdmin);
     setAuthState(currentSession, result.remainingCredits);
     await refreshCloudReceipts();
   } catch (error) {
@@ -504,6 +510,50 @@ async function refreshAccount() {
 }
 
 
+
+
+
+async function testAddCredits() {
+  if (!currentSession) {
+    setStatus("請先登入。", "error");
+    return;
+  }
+
+  if (!currentIsAdmin) {
+    setStatus("這個測試加點功能僅限管理員使用。", "error");
+    return;
+  }
+
+  els.testAddCreditsBtn.disabled = true;
+  setStatus("測試加點中…");
+
+  try {
+    const response = await fetch("/api/add-test-credits", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${currentSession.access_token}`
+      },
+      body: JSON.stringify({
+        amount: 10
+      })
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(result && result.error ? result.error : "測試加點失敗。");
+    }
+
+    setAuthState(currentSession, result.remainingCredits);
+    setStatus(`已測試增加 10 次，目前剩餘 ${result.remainingCredits} 次。`, "ok");
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message || "測試加點失敗。", "error");
+  } finally {
+    els.testAddCreditsBtn.disabled = false;
+  }
+}
 
 
 function togglePurchasePlans() {
@@ -669,6 +719,7 @@ async function signOut() {
 
   await supabaseClient.auth.signOut();
   currentSession = null;
+  currentIsAdmin = false;
   setAuthState(null, null);
   setStatus("已登出。", "ok");
 }
@@ -730,7 +781,8 @@ async function generateReceipt() {
     saveHistory({ artist, song, data: normalized, createdAt: new Date().toISOString() });
 
     if (typeof result.remainingCredits === "number") {
-      setAuthState(currentSession, result.remainingCredits);
+      currentIsAdmin = Boolean(result.isAdmin);
+    setAuthState(currentSession, result.remainingCredits);
     await refreshCloudReceipts();
     }
 
@@ -842,6 +894,7 @@ els.signUpBtn.addEventListener("click", signUp);
 els.signOutBtn.addEventListener("click", signOut);
 els.refreshReceiptsBtn.addEventListener("click", refreshCloudReceipts);
 els.purchaseToggleBtn.addEventListener("click", togglePurchasePlans);
+els.testAddCreditsBtn.addEventListener("click", testAddCredits);
 document.querySelectorAll(".plan-card").forEach(button => {
   button.addEventListener("click", handlePlanClick);
 });

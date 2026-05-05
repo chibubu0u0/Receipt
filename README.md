@@ -192,3 +192,28 @@ https://receipt-six-tau.vercel.app/**
 - 預設收合，畫面更乾淨
 - 點擊「購買生成次數」才展開價格方案
 - 保留三個方案：10 次 NT$49、30 次 NT$129、100 次 NT$299
+
+
+## 管理員測試加點版本
+
+這版新增：
+
+- 登入後若使用者 email 在 `ADMIN_EMAILS` 名單內，會顯示「測試加 10 次」按鈕
+- 點擊後會呼叫 `/api/add-test-credits`
+- 後端會驗證登入者是否為管理員
+- 成功後更新 `user_credits.remaining_credits`
+- 成功後寫入 `credit_logs`，type 為 `purchase_test`
+
+### Vercel 需要新增環境變數
+
+```txt
+ADMIN_EMAILS=你的登入email@example.com
+```
+
+如果有多個管理員，用逗號分隔：
+
+```txt
+ADMIN_EMAILS=you@example.com,partner@example.com
+```
+
+設定完後請重新 Redeploy。

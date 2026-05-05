@@ -1,4 +1,3 @@
-
 async function supabaseRequest(path, options = {}) {
   const supabaseUrl = process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -61,6 +60,15 @@ async function getUserFromToken(req) {
   return user;
 }
 
+function isAdminEmail(email) {
+  const adminEmails = String(process.env.ADMIN_EMAILS || "")
+    .split(",")
+    .map(item => item.trim().toLowerCase())
+    .filter(Boolean);
+
+  return Boolean(email) && adminEmails.includes(String(email).toLowerCase());
+}
+
 async function getOrCreateCredits(userId) {
   const existing = await supabaseRequest(`/rest/v1/user_credits?user_id=eq.${userId}&select=remaining_credits`);
 
@@ -101,20 +109,12 @@ async function updateCredits(userId, remainingCredits) {
   return Array.isArray(updated) && updated[0] ? updated[0].remaining_credits : remainingCredits;
 }
 
-
-
-function isAdminEmail(email) {
-  const adminEmails = String(process.env.ADMIN_EMAILS || "")
-    .split(",")
-    .map(item => item.trim().toLowerCase())
-    .filter(Boolean);
-
-  return Boolean(email) && adminEmails.includes(String(email).toLowerCase());
-}
-
-
 export default async function handler(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "只接受 POST 請求。" });
+  }
 
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return res.status(500).json({
@@ -122,22 +122,46 @@ export default async function handler(req, res) {
     });
   }
 
+  if (!process.env.ADMIN_EMAILS) {
+    return res.status(403).json({
+      error: "尚未設定 ADMIN_EMAILS，因此測試加點功能已停用。"
+    });
+  }
+
   try {
     const user = await getUserFromToken(req);
-    const remainingCredits = await getOrCreateCredits(user.id);
+
+    if (!isAdminEmail(user.email)) {
+      return res.status(403).json({
+        error: "你不是管理員，不能使用測試加點功能。"
+      });
+    }
+
+    const body = req.body || {};
+    const amount = Math.max(1, Math.min(1000, Number(body.amount || 10)));
+    const currentCredits = await getOrCreateCredits(user.id);
+    const remainingCredits = currentCredits + amount;
+
+    await updateCredits(user.id, remainingCredits);
+
+    await supabaseRequest("/rest/v1/credit_logs", {
+      method: "POST",
+      body: JSON.stringify({
+        user_id: user.id,
+        type: "purchase_test",
+        amount,
+        reason: "測試加點"
+      })
+    });
 
     return res.status(200).json({
-      user: {
-        id: user.id,
-        email: user.email
-      },
-      isAdmin: isAdminEmail(user.email),
+      added: amount,
       remainingCredits
     });
   } catch (error) {
     console.error(error);
     return res.status(error.statusCode || 500).json({
-      error: error.message || "讀取會員資料失敗。"
+      error: error.message || "測試加點失敗。"
     });
   }
 }

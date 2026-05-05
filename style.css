@@ -994,6 +994,28 @@ h1 {
   }
 }
 
+
+.admin-test-panel {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 16px;
+  border: 1px dashed rgba(235,226,210,.18);
+  background: rgba(235,226,210,.045);
+}
+
+.test-credit-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.admin-test-note {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
+
 @media (max-width: 980px) {
   .layout { grid-template-columns: 1fr; }
   .control-panel { position: static; }
