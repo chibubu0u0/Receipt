@@ -586,14 +586,20 @@ async function signUp() {
     return;
   }
 
-  const { error } = await supabaseClient.auth.signUp({ email, password });
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: window.location.origin
+    }
+  });
 
   if (error) {
     setStatus(error.message, "error");
     return;
   }
 
-  setStatus("註冊完成。如果 Supabase 開啟 Email 確認，請先到信箱確認後再登入。", "ok");
+  setStatus("註冊完成。請到信箱點擊驗證連結，驗證後會回到本站，再回來登入即可。", "ok");
 }
 
 async function signIn() {

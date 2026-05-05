@@ -149,3 +149,26 @@ OPENAI_MODEL=gpt-4.1-mini
 
 這版將「最近生成」改成不可點擊的本機紀錄展示。
 只有登入後的「我的生成紀錄」可以點擊載入，且 `/api/receipts` 會依照目前登入使用者的 token 只回傳自己的生成紀錄。
+
+
+## Email 驗證導回網站修正
+
+這版在註冊時加入：
+
+```js
+options: {
+  emailRedirectTo: window.location.origin
+}
+```
+
+同時仍需要在 Supabase Dashboard 設定：
+
+- Authentication → URL Configuration → Site URL
+- Authentication → URL Configuration → Redirect URLs
+
+建議都加入正式網站：
+
+```txt
+https://receipt-six-tau.vercel.app
+https://receipt-six-tau.vercel.app/**
+```
