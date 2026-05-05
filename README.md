@@ -381,3 +381,11 @@ computedUppAction = https://sandbox-api.payuni.com.tw/api/upp
 - 若訂單已付款，導回 `payuni_success`
 - 若訂單尚未付款，導回 `payuni_pending`
 - 真正加點仍以 `NotifyURL` 或完整付款 payload 為準，避免誤加點
+
+
+## 電腦版直接下載修正
+
+這版調整 PNG 輸出邏輯：
+
+- 電腦版：按「下載 / 分享 PNG」會直接下載 PNG，不再開啟系統分享選單
+- 手機版：保留分享選單；如果瀏覽器不支援分享，會顯示圖片讓使用者長按儲存
