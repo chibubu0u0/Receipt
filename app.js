@@ -595,6 +595,25 @@ function handlePlanClick(event) {
   setStatus(`已選擇 ${plan.label}，請按「加 ${plan.credits} 次」確認。`, "ok");
 }
 
+
+function submitPaymentForm(action, fields) {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = action;
+  form.style.display = "none";
+
+  Object.entries(fields).forEach(([key, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = key;
+    input.value = String(value);
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
 async function confirmPurchaseOrder() {
   if (!selectedPlanId) {
     setStatus("請先選擇一個生成次數方案。", "error");
@@ -627,7 +646,12 @@ async function confirmPurchaseOrder() {
       throw new Error(result && result.error ? result.error : "建立訂單失敗。");
     }
 
-    setStatus(`已建立待付款訂單 #${result.order.id}：${plan.label} ${plan.credits} 次 / NT$${plan.price}。付款完成後才會增加生成次數。`, "ok");
+    if (!result.payment || !result.payment.action || !result.payment.fields) {
+      throw new Error("付款表單建立失敗。");
+    }
+
+    setStatus(`已建立待付款訂單 #${result.order.id}，正在前往綠界測試付款頁…`, "ok");
+    submitPaymentForm(result.payment.action, result.payment.fields);
   } catch (error) {
     console.error(error);
     setStatus(error.message || "建立訂單失敗。", "error");

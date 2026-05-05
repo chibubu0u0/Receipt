@@ -274,3 +274,46 @@ supabase/payment_setup.sql
 - 選擇方案後，下方會出現確認按鈕，例如「加 10 次」
 - 只有點擊「加 10 次 / 加 30 次 / 加 100 次」後，才會呼叫 `/api/create-purchase-order` 並建立 pending 訂單
 - 選中的方案會有高亮效果
+
+
+## 綠界 ECPay Sandbox 串接版
+
+這版新增綠界測試環境付款流程：
+
+- 使用者點「加 10 次 / 加 30 次 / 加 100 次」
+- 後端建立 `purchase_orders`
+- 後端產生綠界 AIO Checkout 表單參數與 `CheckMacValue`
+- 前端自動送出表單到綠界測試付款頁
+- 綠界付款完成後會 POST 到 `/api/ecpay-return`
+- 後端驗證 `CheckMacValue`
+- 驗證成功且 `RtnCode=1` 後：
+  - `purchase_orders.status` 改為 `paid`
+  - 寫入 `payments`
+  - `user_credits.remaining_credits` 增加
+  - 寫入 `credit_logs`
+
+### Vercel Environment Variables
+
+測試環境可先不設 ECPay 變數，程式內建綠界官方測試用參數：
+
+```txt
+ECPAY_MERCHANT_ID=2000132
+ECPAY_HASH_KEY=5294y06JbISpM5x9
+ECPAY_HASH_IV=v77hoKGq4kWxNNIS
+ECPAY_ACTION_URL=https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5
+```
+
+如果你想明確設定，也可以放到 Vercel Environment Variables。
+
+正式環境時一定要改成正式商店的 MerchantID / HashKey / HashIV / Action URL，且不要放到 GitHub。
+
+### 綠界測試信用卡
+
+常見測試卡：
+
+```txt
+4311-9522-2222-2222
+CVV: 222
+```
+
+付款成功後請回網站重新整理，剩餘生成次數應該會增加。
