@@ -917,6 +917,11 @@ function isMobileDevice() {
   return /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent);
 }
 
+function isIosDevice() {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
 async function forceDownloadPng(dataUrl, filename) {
   const response = await fetch(dataUrl);
   const blob = await response.blob();
@@ -954,15 +959,15 @@ async function downloadPng() {
 
     const filename = `song-receipt-${Date.now()}.png`;
 
-    // 電腦版強制使用 Blob 下載，不走 Web Share API。
-    // 比 data URL 更穩，尤其是 macOS Safari / Chrome。
-    if (!isMobileDevice()) {
+    // Android 與電腦版：直接下載到裝置，不走 Web Share API。
+    // iOS / iPadOS 對瀏覽器下載限制較多，所以保留分享 / 長按儲存流程。
+    if (!isIosDevice()) {
       await forceDownloadPng(dataUrl, filename);
-      setStatus("PNG 已直接下載。", "ok");
+      setStatus(isMobileDevice() ? "PNG 已下載，請到手機的「下載」資料夾查看。" : "PNG 已直接下載。", "ok");
       return;
     }
 
-    // 手機版保留分享 / 儲存體驗。
+    // iPhone / iPad：保留分享 / 儲存體驗。
     const file = dataUrlToFile(dataUrl, filename);
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {

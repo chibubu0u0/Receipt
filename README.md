@@ -419,3 +419,13 @@ computedUppAction = https://sandbox-api.payuni.com.tw/api/upp
 - PAYUNi ReturnURL 修正
 - 電腦版 Blob 直接下載
 - 手機版系統分享選單
+
+
+## Android 下載修正
+
+這版調整 PNG 輸出邏輯：
+
+- Android：改成直接下載 PNG 到手機下載資料夾
+- 電腦版：維持 Blob 直接下載
+- iPhone / iPad：維持系統分享選單或長按儲存
+- 避免 Android 只開分享選單但無法真正儲存圖片
