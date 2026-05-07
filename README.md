@@ -453,3 +453,24 @@ computedUppAction = https://sandbox-api.payuni.com.tw/api/upp
 - 退款政策 → `/refund`
 
 Footer 原本的文字連結仍保留，方便 Paddle 審核時從首頁找到政策頁。
+
+
+## 完整 Paddle 審核政策頁版本
+
+這版重寫並補完整四個公開頁面：
+
+- `/pricing`：產品說明、信用點數方案、交付方式、1 credit = 1 generation
+- `/terms`：服務條款、帳號與點數、AI 內容、音樂/歌詞權利、付款與退款
+- `/privacy`：收集資料、用途、第三方處理者、付款資料、cookie/local storage、資料保留
+- `/refund`：未使用點數、已使用點數、重複付款、失敗交付、退款申請方式
+
+注意：頁面中的 `chibubux3@gmail.com` / `chibubux3@gmail.com` 請在提交 Paddle 前改成你真的能收信的信箱。
+
+
+## 聯絡信箱更新
+
+這版已將政策頁與說明文件中的聯絡信箱統一改為：
+
+```txt
+chibubux3@gmail.com
+```
