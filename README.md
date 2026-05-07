@@ -441,3 +441,15 @@ computedUppAction = https://sandbox-api.payuni.com.tw/api/upp
 - `/refund`
 
 同時新增首頁 footer 連結與 `vercel.json` clean URLs，讓 Vercel 可以用無副檔名網址開啟頁面。
+
+
+## 首頁政策按鈕版本
+
+這版在主頁新增明顯的按鈕連結：
+
+- 查看價格方案 → `/pricing`
+- 服務條款 → `/terms`
+- 隱私權政策 → `/privacy`
+- 退款政策 → `/refund`
+
+Footer 原本的文字連結仍保留，方便 Paddle 審核時從首頁找到政策頁。
