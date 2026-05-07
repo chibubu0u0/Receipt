@@ -429,3 +429,15 @@ computedUppAction = https://sandbox-api.payuni.com.tw/api/upp
 - 電腦版：維持 Blob 直接下載
 - iPhone / iPad：維持系統分享選單或長按儲存
 - 避免 Android 只開分享選單但無法真正儲存圖片
+
+
+## Paddle 審核頁面版本
+
+這版新增 Paddle 審核需要的公開頁面：
+
+- `/pricing`
+- `/terms`
+- `/privacy`
+- `/refund`
+
+同時新增首頁 footer 連結與 `vercel.json` clean URLs，讓 Vercel 可以用無副檔名網址開啟頁面。
