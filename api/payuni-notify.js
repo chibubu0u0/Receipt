@@ -88,9 +88,9 @@ async function getOrCreateCredits(userId) {
 
   const inserted = await supabaseRequest("/rest/v1/user_credits", {
     method: "POST",
-    body: JSON.stringify({ user_id: userId, remaining_credits: 3 })
+    body: JSON.stringify({ user_id: userId, remaining_credits: 10 })
   });
-  return Array.isArray(inserted) && inserted[0] ? inserted[0].remaining_credits : 3;
+  return Array.isArray(inserted) && inserted[0] ? inserted[0].remaining_credits : 10;
 }
 
 async function updateCredits(userId, remainingCredits) {

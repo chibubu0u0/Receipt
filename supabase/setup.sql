@@ -3,7 +3,7 @@
 
 create table if not exists public.user_credits (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  remaining_credits integer not null default 3,
+  remaining_credits integer not null default 10,
   updated_at timestamptz not null default now()
 );
 

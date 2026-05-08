@@ -464,7 +464,7 @@ function setAuthState(session, credits) {
   currentCredits = credits;
 
   if (!session) {
-    els.accountStatus.textContent = "尚未登入｜登入後可領免費 3 次";
+    els.accountStatus.textContent = "尚未登入｜登入後可領免費 10 次";
     els.creditPill.textContent = "0 次";
     els.authForm.hidden = false;
     els.userPanel.hidden = true;
@@ -569,10 +569,15 @@ function togglePurchasePlans() {
   els.purchaseToggleBtn.setAttribute("aria-expanded", String(!isCollapsed));
 }
 
+const CONTACT_EMAIL = "chibubux3@gmail.com";
+// TODO: 將 IG_USERNAME 改成你的 Instagram 帳號，例如 "songreceipt.studio"。
+const IG_USERNAME = "ongaku_x3";
+const INSTAGRAM_URL = `https://www.instagram.com/${IG_USERNAME}/`;
+
 const CREDIT_PLANS = {
-  starter: { credits: 10, price: 49, label: "小包" },
-  standard: { credits: 30, price: 129, label: "中包" },
-  pro: { credits: 100, price: 299, label: "大包" }
+  starter: { credits: 10, price: "私訊確認", label: "回饋包" },
+  standard: { credits: 30, price: "私訊確認", label: "創作包" },
+  pro: { credits: 100, price: "私訊確認", label: "大量包" }
 };
 
 function handlePlanClick(event) {
@@ -589,10 +594,10 @@ function handlePlanClick(event) {
   });
 
   els.selectedPlanPanel.hidden = false;
-  els.selectedPlanTitle.textContent = `${plan.label}｜${plan.credits} 次｜NT$${plan.price}`;
-  els.selectedPlanSubtitle.textContent = "確認後才會建立購買訂單，不會因為單純點選方案就產生訂單。";
-  els.confirmPurchaseBtn.textContent = `加 ${plan.credits} 次`;
-  setStatus(`已選擇 ${plan.label}，請按「加 ${plan.credits} 次」確認。`, "ok");
+  els.selectedPlanTitle.textContent = `${plan.label}｜${plan.credits} 次｜${plan.price}`;
+  els.selectedPlanSubtitle.textContent = "點擊下方按鈕會開啟 Instagram。購買生成次數採人工確認與手動補點。";
+  els.confirmPurchaseBtn.textContent = `私訊購買 ${plan.credits} 次`;
+  setStatus(`已選擇 ${plan.label}。請私訊 Instagram 確認購買 ${plan.credits} 次。`, "ok");
 }
 
 
@@ -619,18 +624,18 @@ function showPaymentReturnMessage() {
   const payment = params.get("payment");
 
   if (payment === "payuni_success") {
-    setStatus("PAYUNi 付款完成，生成次數已增加。", "ok");
+    setStatus("已完成處理，請重新整理查看生成次數。", "ok");
     history.replaceState({}, document.title, window.location.pathname);
     refreshAccount();
   }
 
   if (payment === "payuni_pending") {
-    setStatus("訂單尚未完成付款。若使用 ATM / 超商代碼，付款入帳後才會增加生成次數。", "ok");
+    setStatus("目前不使用自動金流，若已聯絡購買請等待人工確認。", "ok");
     history.replaceState({}, document.title, window.location.pathname);
   }
 
   if (payment === "payuni_error") {
-    setStatus("PAYUNi 付款回傳未完成。若你剛付款成功，請稍等幾秒後重新整理，系統會以 NotifyURL 入帳狀態為準。", "error");
+    setStatus("目前不使用自動金流。若需要購買生成次數，請私訊 Instagram 或寄信聯絡。", "error");
     history.replaceState({}, document.title, window.location.pathname);
   }
 }
@@ -645,41 +650,20 @@ async function confirmPurchaseOrder() {
   const plan = CREDIT_PLANS[selectedPlanId];
 
   if (!currentSession) {
-    setStatus("請先登入，再購買生成次數。", "error");
+    setStatus("請先登入，再私訊購買生成次數。", "error");
     return;
   }
 
-  els.confirmPurchaseBtn.disabled = true;
-  setStatus("正在建立付款訂單…");
+  const userEmail = currentSession.user && currentSession.user.email ? currentSession.user.email : "";
+  const message = `你好，我想購買 Song Receipt Studio ${plan.label}：${plan.credits} 次生成。我的登入 Email 是：${userEmail}`;
+  const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Song Receipt Studio 購買生成次數")}&body=${encodeURIComponent(message)}`;
 
-  try {
-    const response = await fetch("/api/create-purchase-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${currentSession.access_token}`
-      },
-      body: JSON.stringify({ planId: selectedPlanId })
-    });
+  // 先開 Instagram；若瀏覽器阻擋新分頁，使用者仍可用 email 聯絡。
+  window.open(INSTAGRAM_URL, "_blank", "noopener");
+  setStatus(`已開啟 Instagram。請私訊購買 ${plan.credits} 次；也可以寄信到 ${CONTACT_EMAIL}。`, "ok");
 
-    const result = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      throw new Error(result && result.error ? result.error : "建立訂單失敗。");
-    }
-
-    if (!result.payment || !result.payment.action || !result.payment.fields) {
-      throw new Error("PAYUNi 付款表單建立失敗。");
-    }
-
-    setStatus(`已建立待付款訂單 #${result.order.id}，正在前往 PAYUNi 付款頁…`, "ok");
-    submitPaymentForm(result.payment.action, result.payment.fields);
-  } catch (error) {
-    console.error(error);
-    setStatus(error.message || "建立訂單失敗。", "error");
-  } finally {
-    els.confirmPurchaseBtn.disabled = false;
-  }
+  // 將 email 連結保留在 console，方便需要時複製。
+  console.info("Purchase contact email:", mailtoUrl);
 }
 
 
@@ -783,7 +767,7 @@ showPaymentReturnMessage();
     return;
   }
 
-  setStatus("註冊完成。請到信箱點擊驗證連結，驗證後會回到本站，再回來登入即可。", "ok");
+  setStatus("註冊完成。請到信箱點擊驗證連結，驗證後會回到本站；登入後可領 10 次免費生成。", "ok");
 }
 
 async function signIn() {

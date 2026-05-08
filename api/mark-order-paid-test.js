@@ -80,11 +80,11 @@ async function getOrCreateCredits(userId) {
     method: "POST",
     body: JSON.stringify({
       user_id: userId,
-      remaining_credits: 3
+      remaining_credits: 10
     })
   });
 
-  return Array.isArray(inserted) && inserted[0] ? inserted[0].remaining_credits : 3;
+  return Array.isArray(inserted) && inserted[0] ? inserted[0].remaining_credits : 10;
 }
 
 async function updateCredits(userId, remainingCredits) {

@@ -80,7 +80,7 @@ async function getOrCreateCredits(userId) {
     method: "POST",
     body: JSON.stringify({
       user_id: userId,
-      remaining_credits: 3
+      remaining_credits: 10
     })
   });
 
@@ -89,12 +89,12 @@ async function getOrCreateCredits(userId) {
     body: JSON.stringify({
       user_id: userId,
       type: "signup_bonus",
-      amount: 3,
-      reason: "新會員免費生成次數"
+      amount: 10,
+      reason: "新會員免費 10 次生成"
     })
   });
 
-  return Array.isArray(inserted) && inserted[0] ? inserted[0].remaining_credits : 3;
+  return Array.isArray(inserted) && inserted[0] ? inserted[0].remaining_credits : 10;
 }
 
 async function updateCredits(userId, remainingCredits) {
