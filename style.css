@@ -1684,3 +1684,56 @@ h1 {
     max-width: 180px;
   }
 }
+
+.admin-panel-title {
+  color: var(--cream);
+  font-size: 13px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.admin-manual-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.admin-manual-grid label,
+.admin-reason-field {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-manual-grid span,
+.admin-reason-field span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-manual-grid input,
+.admin-reason-field input {
+  width: 100%;
+  border: 1px solid rgba(235,226,210,.13);
+  background: rgba(0,0,0,.18);
+  color: var(--cream);
+  border-radius: 14px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.admin-manual-grid input:focus,
+.admin-reason-field input:focus {
+  border-color: rgba(235,226,210,.38);
+}
+
+.admin-reason-field {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 560px) {
+  .admin-manual-grid {
+    grid-template-columns: 1fr;
+  }
+}

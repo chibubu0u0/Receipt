@@ -68,7 +68,7 @@
             <button class="purchase-toggle" id="purchaseToggleBtn" type="button" aria-expanded="false">
               <div>
                 <div class="purchase-title">點數與支持方式</div>
-                <div class="purchase-subtitle">每人免費 10 次｜自由贊助與私訊購買分開處理</div>
+                <div class="purchase-subtitle">免費 10 次｜10 次 NT$49｜30 次 NT$129｜100 次 NT$299</div>
               </div>
               <span class="purchase-chevron" aria-hidden="true">⌄</span>
             </button>
@@ -78,20 +78,20 @@
                 <button class="plan-card" data-plan="starter">
                   <span class="plan-name">回饋包</span>
                   <strong>10 次</strong>
-                  <span class="plan-price">私訊確認</span>
+                  <span class="plan-price">NT$49</span>
                 </button>
 
                 <button class="plan-card recommended" data-plan="standard">
                   <span class="plan-badge">推薦</span>
                   <span class="plan-name">創作包</span>
                   <strong>30 次</strong>
-                  <span class="plan-price">私訊確認</span>
+                  <span class="plan-price">NT$129</span>
                 </button>
 
                 <button class="plan-card" data-plan="pro">
                   <span class="plan-name">大量包</span>
                   <strong>100 次</strong>
-                  <span class="plan-price">私訊確認</span>
+                  <span class="plan-price">NT$299</span>
                 </button>
               </div>
 
@@ -117,15 +117,33 @@
               </div>
 
               <div class="purchase-note">
-                每個帳號註冊後提供免費 10 次生成。若需要更多生成次數，請私訊 Instagram 或寄信聯絡，我會確認後手動補點。
+                每個帳號註冊後提供免費 10 次生成。若需要更多生成次數，可私訊 Instagram @ongaku_x3 或寄信聯絡；確認後我會手動補點。
               </div>
 
               <div class="admin-test-panel" id="adminTestPanel" hidden>
-                <button class="btn btn-secondary test-credit-btn" id="testAddCreditsBtn" type="button">
-                  測試加 10 次
+                <div class="admin-panel-title">管理員手動補點</div>
+                <div class="admin-manual-grid">
+                  <label>
+                    <span>使用者 Email</span>
+                    <input id="adminTargetEmail" type="email" placeholder="customer@example.com" />
+                  </label>
+                  <label>
+                    <span>增加次數</span>
+                    <input id="adminCreditAmount" type="number" min="1" max="1000" value="10" />
+                  </label>
+                </div>
+                <label class="admin-reason-field">
+                  <span>備註</span>
+                  <input id="adminCreditReason" type="text" value="Instagram 私訊購買 / 贊助回饋" />
+                </label>
+                <button class="btn btn-secondary test-credit-btn" id="manualAddCreditsBtn" type="button">
+                  幫使用者增加次數
+                </button>
+                <button class="btn btn-ghost test-credit-btn" id="testAddCreditsBtn" type="button">
+                  測試加自己 10 次
                 </button>
                 <div class="admin-test-note">
-                  僅限管理員測試。正式上線前請移除或保持 ADMIN_EMAILS 限制。
+                  僅限 ADMIN_EMAILS 內的管理員可使用。手動補點會寫入 credit_logs。
                 </div>
               </div>
             </div>
@@ -234,6 +252,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=lineqr-ig-1"></script>
+  <script src="./app.js?v=pricing-manual-admin-1"></script>
 </body>
 </html>

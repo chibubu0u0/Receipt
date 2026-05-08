@@ -28,6 +28,10 @@ const els = {
   purchasePlans: document.getElementById("purchasePlans"),
   purchaseToggleBtn: document.getElementById("purchaseToggleBtn"),
   adminTestPanel: document.getElementById("adminTestPanel"),
+  adminTargetEmail: document.getElementById("adminTargetEmail"),
+  adminCreditAmount: document.getElementById("adminCreditAmount"),
+  adminCreditReason: document.getElementById("adminCreditReason"),
+  manualAddCreditsBtn: document.getElementById("manualAddCreditsBtn"),
   testAddCreditsBtn: document.getElementById("testAddCreditsBtn"),
   selectedPlanPanel: document.getElementById("selectedPlanPanel"),
   selectedPlanTitle: document.getElementById("selectedPlanTitle"),
@@ -564,6 +568,65 @@ async function testAddCredits() {
 }
 
 
+async function manualAddCredits() {
+  if (!currentSession) {
+    setStatus("請先登入。", "error");
+    return;
+  }
+
+  if (!currentIsAdmin) {
+    setStatus("這個手動補點功能僅限管理員使用。", "error");
+    return;
+  }
+
+  const targetEmail = els.adminTargetEmail.value.trim();
+  const amount = Number(els.adminCreditAmount.value || 0);
+  const reason = els.adminCreditReason.value.trim() || "手動補點";
+
+  if (!targetEmail || !targetEmail.includes("@")) {
+    setStatus("請輸入要補點的使用者 Email。", "error");
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount < 1) {
+    setStatus("請輸入正確的增加次數。", "error");
+    return;
+  }
+
+  els.manualAddCreditsBtn.disabled = true;
+  setStatus("正在幫使用者補點…");
+
+  try {
+    const response = await fetch("/api/admin-add-credits", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${currentSession.access_token}`
+      },
+      body: JSON.stringify({
+        targetEmail,
+        amount,
+        reason
+      })
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(result && result.error ? result.error : "手動補點失敗。");
+    }
+
+    setStatus(`已幫 ${targetEmail} 增加 ${amount} 次，目前剩餘 ${result.remainingCredits} 次。`, "ok");
+    els.adminTargetEmail.value = "";
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message || "手動補點失敗。", "error");
+  } finally {
+    els.manualAddCreditsBtn.disabled = false;
+  }
+}
+
+
 function togglePurchasePlans() {
   const isCollapsed = els.purchasePlans.classList.toggle("collapsed");
   els.purchaseToggleBtn.setAttribute("aria-expanded", String(!isCollapsed));
@@ -575,9 +638,9 @@ const IG_USERNAME = "ongaku_x3";
 const INSTAGRAM_URL = `https://www.instagram.com/${IG_USERNAME}/`;
 
 const CREDIT_PLANS = {
-  starter: { credits: 10, price: "私訊確認", label: "回饋包" },
-  standard: { credits: 30, price: "私訊確認", label: "創作包" },
-  pro: { credits: 100, price: "私訊確認", label: "大量包" }
+  starter: { credits: 10, price: "NT$49", label: "回饋包" },
+  standard: { credits: 30, price: "NT$129", label: "創作包" },
+  pro: { credits: 100, price: "NT$299", label: "大量包" }
 };
 
 function handlePlanClick(event) {
@@ -597,7 +660,7 @@ function handlePlanClick(event) {
   els.selectedPlanTitle.textContent = `${plan.label}｜${plan.credits} 次｜${plan.price}`;
   els.selectedPlanSubtitle.textContent = "點擊下方按鈕會開啟 Instagram。購買生成次數採人工確認與手動補點。";
   els.confirmPurchaseBtn.textContent = `私訊購買 ${plan.credits} 次`;
-  setStatus(`已選擇 ${plan.label}。請私訊 Instagram 確認購買 ${plan.credits} 次。`, "ok");
+  setStatus(`已選擇 ${plan.label}：${plan.credits} 次（${plan.price}）。請私訊 Instagram 確認購買。`, "ok");
 }
 
 
@@ -655,7 +718,7 @@ async function confirmPurchaseOrder() {
   }
 
   const userEmail = currentSession.user && currentSession.user.email ? currentSession.user.email : "";
-  const message = `你好，我想購買 Song Receipt Studio ${plan.label}：${plan.credits} 次生成。我的登入 Email 是：${userEmail}`;
+  const message = `你好，我想購買 Song Receipt Studio ${plan.label}：${plan.credits} 次生成（${plan.price}）。我的登入 Email 是：${userEmail}`;
   const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Song Receipt Studio 購買生成次數")}&body=${encodeURIComponent(message)}`;
 
   // 先開 Instagram；若瀏覽器阻擋新分頁，使用者仍可用 email 聯絡。
@@ -1006,6 +1069,7 @@ els.signOutBtn.addEventListener("click", signOut);
 els.refreshReceiptsBtn.addEventListener("click", refreshCloudReceipts);
 els.purchaseToggleBtn.addEventListener("click", togglePurchasePlans);
 els.testAddCreditsBtn.addEventListener("click", testAddCredits);
+els.manualAddCreditsBtn.addEventListener("click", manualAddCredits);
 document.querySelectorAll(".plan-card").forEach(button => {
   button.addEventListener("click", handlePlanClick);
 });

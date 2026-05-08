@@ -500,3 +500,35 @@ chibubux3@gmail.com
 - Instagram 私訊帳號改為 `ongaku_x3`
 - QR 圖片放在 `assets/line-donation-qr.png`
 - 首頁文案改為透過 LINE QR Code 自由贊助
+
+
+## 定價 + 管理員手動補點版
+
+這版已填入點數定價：
+
+- 回饋包：10 次｜NT$49
+- 創作包：30 次｜NT$129
+- 大量包：100 次｜NT$299
+
+購買仍為人工確認，使用者會被引導私訊 Instagram `@ongaku_x3` 或寄信。
+
+### 管理員手動補點
+
+新增：
+
+- `/api/admin-add-credits`
+- 首頁管理員面板：輸入使用者 Email、增加次數、備註，直接補點
+
+使用前請確認 Vercel 有設定：
+
+```txt
+ADMIN_EMAILS=你的管理員登入信箱
+SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
+```
+
+只有 `ADMIN_EMAILS` 內的管理員登入後才會看到補點面板。
+
+補點成功後會更新：
+
+- `user_credits.remaining_credits`
+- `credit_logs` 新增一筆 `manual_add`
