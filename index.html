@@ -164,10 +164,25 @@
         </div>
 
 
-        <div class="tabs" aria-label="分析模式">
-          <button class="tab active" data-depth="standard">標準分析</button>
-          <button class="tab" data-depth="deep">深層進化</button>
-          <button class="tab" data-depth="director">導演版</button>
+        <div class="mode-preview-wrap">
+          <div class="control-label">分析模式預覽</div>
+          <div class="tabs mode-preview-grid" aria-label="分析模式">
+            <button class="tab mode-card active" data-depth="standard" type="button">
+              <span class="mode-card-title">標準分析</span>
+              <span class="mode-card-desc">清楚、好讀，適合快速生成社群小票。</span>
+              <span class="mode-card-sample">情緒 / 色彩 / 具現化</span>
+            </button>
+            <button class="tab mode-card" data-depth="deep" type="button">
+              <span class="mode-card-title">深層進化</span>
+              <span class="mode-card-desc">更細緻的心理狀態、場景與物件隱喻。</span>
+              <span class="mode-card-sample">記憶場景 / 物件符號 / 聽感層次</span>
+            </button>
+            <button class="tab mode-card" data-depth="director" type="button">
+              <span class="mode-card-title">導演版</span>
+              <span class="mode-card-desc">像 MV 分鏡，畫面感最強、色彩最戲劇化。</span>
+              <span class="mode-card-sample">鏡頭 / 光線 / 劇照式氛圍</span>
+            </button>
+          </div>
         </div>
 
         <div class="form-grid">
@@ -203,6 +218,24 @@
                 <option value="square">方形貼文</option>
                 <option value="story">限時動態</option>
               </select>
+
+              <div class="size-preview-grid" aria-label="輸出尺寸預覽">
+                <button class="size-card active" data-size="receiptOnly" type="button">
+                  <span class="size-thumb receipt-thumb"><i></i></span>
+                  <strong>收據</strong>
+                  <small>長條小票，保留完整內容</small>
+                </button>
+                <button class="size-card" data-size="square" type="button">
+                  <span class="size-thumb square-thumb"><i></i></span>
+                  <strong>方形</strong>
+                  <small>1:1 貼文卡片，摘要式呈現</small>
+                </button>
+                <button class="size-card" data-size="story" type="button">
+                  <span class="size-thumb story-thumb"><i></i></span>
+                  <strong>限時</strong>
+                  <small>9:16 垂直版，畫面留白更足</small>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -214,7 +247,7 @@
         </div>
 
         <div class="hint">
-          小提示：如果你要拿去當作品集，可以用「深層進化」；如果要做成社群貼文，可以用「導演版」加上方形或限動尺寸。
+          小提示：點選上方模式與尺寸預覽即可切換。方形貼文會輸出真正 1:1 的摘要卡片；收據模式會保留完整長條內容。
         </div>
         <div id="status" class="status"></div>
 
@@ -252,6 +285,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=song-validation-1"></script>
+  <script src="./app.js?v=mode-size-previews-1"></script>
 </body>
 </html>

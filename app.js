@@ -352,9 +352,16 @@ function applyTheme() {
   if (els.themeSelect.value === "night") els.receipt.classList.add("night");
 }
 
+function updateSizePreviewCards() {
+  document.querySelectorAll(".size-card").forEach(card => {
+    card.classList.toggle("active", card.dataset.size === els.sizeSelect.value);
+  });
+}
+
 function applySize() {
   const themeClass = `theme-${els.themeSelect.value}`;
   els.captureArea.className = `capture-shell ${els.sizeSelect.value} ${themeClass}`;
+  updateSizePreviewCards();
 }
 
 function getHistory() {
@@ -1061,6 +1068,7 @@ function resetApp() {
   els.listenerNote.value = "";
   els.savePanel.classList.remove("show");
   renderReceipt(demoData, { artist: "Demo Artist", song: "Demo Song" });
+applySize();
   setStatus("已清空輸入，保留範例預覽。", "ok");
 }
 
@@ -1069,6 +1077,19 @@ document.querySelectorAll(".tab").forEach(tab => {
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
     currentDepth = tab.dataset.depth;
+
+    const label = tab.querySelector(".mode-card-title") ? tab.querySelector(".mode-card-title").textContent : tab.textContent;
+    setStatus(`已切換為「${label}」。不同模式會影響文字深度、場景細節、物件隱喻與色彩描述。`, "ok");
+  });
+});
+
+document.querySelectorAll(".size-card").forEach(card => {
+  card.addEventListener("click", () => {
+    els.sizeSelect.value = card.dataset.size;
+    applySize();
+
+    const label = card.querySelector("strong") ? card.querySelector("strong").textContent : card.dataset.size;
+    setStatus(`已切換輸出尺寸：「${label}」。`, "ok");
   });
 });
 
@@ -1100,3 +1121,4 @@ els.themeSelect.addEventListener("change", () => {
 els.sizeSelect.addEventListener("change", applySize);
 
 renderReceipt(demoData, { artist: "Demo Artist", song: "Demo Song" });
+applySize();
