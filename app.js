@@ -347,68 +347,62 @@ function buildFullReceiptHtml(normalized) {
 }
 
 function buildSquareReceiptHtml(normalized) {
+  const mainEmotion = normalized.emotions[0] || { label: "情緒", value: 80 };
+  const subEmotion = normalized.emotions[1] || { label: "餘韻", value: 70 };
+
   const emotionHtml = normalized.emotions.slice(0, 4).map(item => `
-    <div class="square-emotion-chip">
+    <div class="sq3-emotion">
       <span>${escapeHtml(item.label)}</span>
       <strong>${item.value}</strong>
     </div>
   `).join("");
 
   const colorHtml = normalized.colors.slice(0, 3).map(item => `
-    <span class="square-color" style="--c:${item.hex}" title="${escapeHtml(item.name)}"></span>
+    <span class="sq3-color" style="--c:${item.hex}" title="${escapeHtml(item.name)}"></span>
   `).join("");
 
-  const objectHtml = normalized.objects.slice(0, 2).map((item, i) => `
-    <div class="square-object">
-      <span>0${i + 1}</span>
-      <strong>${escapeHtml(item.name)}</strong>
-      <small>${escapeHtml(compactReceiptText(item.meaning, 26))}</small>
-    </div>
-  `).join("");
-
-  const itemHtml = normalized.items.slice(0, 3).map(item => `
-    <div class="square-item-row">
-      <span>${escapeHtml(item.name)}</span>
-      <strong>${item.intensity}%</strong>
-    </div>
-  `).join("");
+  const object = normalized.objects[0] || { name: "記憶物件", meaning: "情緒的具現化" };
+  const item = normalized.items[0] || { name: "心情項目", intensity: mainEmotion.value || 80 };
 
   return `
-    <section class="square-hero">
-      <div class="square-kicker">AI EMOTIONAL CHECKOUT</div>
-      <h3>${escapeHtml(compactReceiptText(normalized.tagline, 18))}</h3>
-      <p>${escapeHtml(compactReceiptText(normalized.soul, 62))}</p>
-    </section>
-
-    <section class="square-mini-section">
-      <div class="square-section-head"><span>情緒濃度</span><span>01</span></div>
-      <div class="square-emotions">${emotionHtml}</div>
-    </section>
-
-    <section class="square-mini-section">
-      <div class="square-section-head"><span>色彩與情緒輪廓</span><span>02</span></div>
-      <div class="square-colors">${colorHtml}</div>
-      ${makeMelodySvg(normalized.melody, normalized.colors)}
-    </section>
-
-    <section class="square-bottom-grid">
-      <div>
-        <div class="square-section-head"><span>具現化</span><span>03</span></div>
-        <div class="square-objects">${objectHtml}</div>
+    <section class="sq3-card">
+      <div class="sq3-topline">
+        <span>AI EMOTIONAL CHECKOUT</span>
+        <span>SONG RECEIPT</span>
       </div>
-      <div>
-        <div class="square-section-head"><span>結帳摘要</span><span>04</span></div>
-        <div class="square-items">${itemHtml}</div>
-      </div>
-    </section>
 
-    <section class="square-vibe">
-      <strong>${escapeHtml(normalized.vibe)}</strong>
-      <span>${escapeHtml(compactReceiptText(normalized.closing, 34))}</span>
+      <div class="sq3-hero">
+        <h3>${escapeHtml(compactReceiptText(normalized.tagline, 16))}</h3>
+        <p>${escapeHtml(compactReceiptText(normalized.soul, 46))}</p>
+      </div>
+
+      <div class="sq3-emotion-grid">${emotionHtml}</div>
+
+      <div class="sq3-color-wave">
+        <div class="sq3-colors">${colorHtml}</div>
+        ${makeMelodySvg(normalized.melody, normalized.colors)}
+      </div>
+
+      <div class="sq3-bottom">
+        <div class="sq3-mini">
+          <small>具現化</small>
+          <strong>${escapeHtml(compactReceiptText(object.name, 12))}</strong>
+          <span>${escapeHtml(compactReceiptText(object.meaning, 20))}</span>
+        </div>
+        <div class="sq3-mini">
+          <small>結帳摘要</small>
+          <strong>${escapeHtml(compactReceiptText(item.name, 12))}</strong>
+          <span>${item.intensity}% · ${escapeHtml(subEmotion.label)}</span>
+        </div>
+      </div>
+
+      <div class="sq3-vibe">
+        <strong>${escapeHtml(compactReceiptText(normalized.vibe, 10))}</strong>
+        <span>${escapeHtml(compactReceiptText(normalized.closing, 28))}</span>
+      </div>
     </section>
   `;
 }
-
 
 function buildStoryReceiptHtml(normalized) {
   const emotionHtml = normalized.emotions.slice(0, 4).map(item => `
@@ -1204,8 +1198,8 @@ async function downloadPng() {
     if (!isIosDevice()) {
       await forceDownloadPng(dataUrl, filename);
       setStatus(els.sizeSelect.value === "story"
-        ? (isMobileDevice() ? "IG 限時動態模板已下載，請到手機「下載」資料夾，再分享到 Instagram。" : "IG 限時動態模板 PNG 已直接下載。")
-        : (isMobileDevice() ? "PNG 已下載，請到手機的「下載」資料夾查看。" : "PNG 已直接下載。"),
+        ? (isMobileDevice() ? "IG 限時動態模板已下載，請到手機「下載」資料夾，再分享到 Instagram。" : "IG 限時動態模板 PNG 已直接下載，背景為透明。")
+        : (isMobileDevice() ? "PNG 已下載，請到手機的「下載」資料夾查看。" : "PNG 已直接下載，背景為透明。"),
         "ok");
       return;
     }
