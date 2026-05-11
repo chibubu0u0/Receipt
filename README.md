@@ -617,3 +617,16 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 手機分享時標題會使用 `Song Receipt IG Story`
 
 注意：網頁不能保證直接發到 Instagram 限動；最穩定做法是下載 PNG 後，在 Instagram 限時動態選取圖片發布。
+
+
+## IG 限動分享按鈕版
+
+這版新增：
+
+- 「分享到 IG 限動」按鈕
+- 按下後會自動切換成 IG 限動 9:16 模板
+- 產生 PNG 後優先呼叫手機系統分享選單
+- 若手機支援分享檔案，使用者可選 Instagram / Stories
+- 若瀏覽器不支援，會自動下載 PNG 並提示手動到 Instagram 限動選圖
+
+注意：純網頁無法保證一鍵直接把圖片放入 Instagram 限動編輯器；這版採用最穩定的 Web Share API / 下載備援流程。

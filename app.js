@@ -9,6 +9,7 @@ const els = {
   generateBtn: document.getElementById("generateBtn"),
   demoBtn: document.getElementById("demoBtn"),
   downloadBtn: document.getElementById("downloadBtn"),
+  shareStoryBtn: document.getElementById("shareStoryBtn"),
   resetBtn: document.getElementById("resetBtn"),
   historyToggleBtn: document.getElementById("historyToggleBtn"),
   status: document.getElementById("status"),
@@ -1222,6 +1223,75 @@ async function downloadPng() {
   }
 }
 
+
+async function shareToInstagramStory() {
+  if (!window.htmlToImage) {
+    setStatus("圖片輸出套件尚未載入完成，請確認網路後重新整理。", "error");
+    return;
+  }
+
+  const previousSize = els.sizeSelect.value;
+
+  try {
+    els.shareStoryBtn.disabled = true;
+    els.downloadBtn.disabled = true;
+
+    // 先切換成 IG 限動專用 9:16 模板，再輸出圖片。
+    if (els.sizeSelect.value !== "story") {
+      els.sizeSelect.value = "story";
+      applySize();
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }
+
+    setStatus("正在產生 IG 限動模板…");
+
+    const dataUrl = await window.htmlToImage.toPng(els.captureArea, {
+      pixelRatio: 3,
+      cacheBust: true,
+      backgroundColor: "#0d0d0d"
+    });
+
+    const filename = `song-receipt-ig-story-${Date.now()}.png`;
+    const file = dataUrlToFile(dataUrl, filename);
+
+    // 手機優先開啟系統分享選單；使用者可選 Instagram / Stories。
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: "Song Receipt IG Story",
+        text: "Song Receipt Studio"
+      });
+
+      setStatus("已開啟手機分享選單。請選擇 Instagram 或限時動態發布。", "ok");
+      return;
+    }
+
+    // 不支援分享檔案時，改成直接下載。
+    await forceDownloadPng(dataUrl, filename);
+    setStatus(isMobileDevice()
+      ? "此瀏覽器無法直接分享到 IG。已下載 IG 限動圖，請到 Instagram 限時動態選取圖片。"
+      : "IG 限動圖已下載。請傳到手機後分享到 Instagram 限時動態。",
+      "ok");
+  } catch (error) {
+    console.error(error);
+
+    if (error && error.name === "AbortError") {
+      setStatus("已取消分享。", "error");
+    } else {
+      setStatus(error.message || "IG 限動分享失敗，請改用下載 PNG。", "error");
+    }
+  } finally {
+    els.shareStoryBtn.disabled = false;
+    els.downloadBtn.disabled = false;
+
+    // 保留使用者剛剛已切到的 IG 限動預覽，不切回去，方便確認畫面。
+    if (previousSize !== "story") {
+      updateSizePreviewCards();
+    }
+  }
+}
+
+
 function loadDemo() {
   els.artist.value = "Taylor Swift";
   els.song.value = "cardigan";
@@ -1264,6 +1334,7 @@ document.querySelectorAll(".size-card").forEach(card => {
 els.generateBtn.addEventListener("click", generateReceipt);
 els.demoBtn.addEventListener("click", loadDemo);
 els.downloadBtn.addEventListener("click", downloadPng);
+els.shareStoryBtn.addEventListener("click", shareToInstagramStory);
 els.resetBtn.addEventListener("click", resetApp);
 els.signInBtn.addEventListener("click", signIn);
 els.signUpBtn.addEventListener("click", signUp);

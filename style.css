@@ -2892,3 +2892,14 @@ h1 {
 .capture-shell.story .receipt-foot {
   display: none;
 }
+
+.ig-story-btn {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(235,226,210,.18), transparent 56%),
+    rgba(235,226,210,.09);
+}
+
+.ig-story-btn::before {
+  content: "↗";
+  margin-right: 6px;
+}
