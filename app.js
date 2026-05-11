@@ -1186,7 +1186,7 @@ async function downloadPng() {
     return;
   }
 
-  setStatus("正在輸出透明 PNG…");
+  setStatus("正在輸出收據 PNG…");
   els.savePanel.classList.remove("show");
 
   // 匯出時暫時移除黑色外框、陰影與預覽用背景，避免下載圖出現黑邊或被陰影裁切。
@@ -1195,7 +1195,7 @@ async function downloadPng() {
   try {
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-    const node = els.captureArea;
+    const node = document.querySelector(".receipt-wrap") || els.receipt || els.captureArea;
     const rect = node.getBoundingClientRect();
     const dataUrl = await window.htmlToImage.toPng(node, {
       pixelRatio: 3,
@@ -1216,7 +1216,7 @@ async function downloadPng() {
       await forceDownloadPng(dataUrl, filename);
       setStatus(isMobileDevice()
         ? "收據 PNG 已下載，請到手機「下載」資料夾查看。"
-        : "收據 PNG 已直接下載，背景為透明。",
+        : "收據 PNG 已直接下載，收據紙會保留紙色。",
         "ok");
       return;
     }
@@ -1231,7 +1231,7 @@ async function downloadPng() {
     }
 
     els.saveImage.src = dataUrl;
-    els.savePanelText.textContent = "透明 PNG 已產生。請長按圖片，選擇「儲存到照片」或「加入照片」。";
+    els.savePanelText.textContent = "收據 PNG 已產生。請長按圖片，選擇「儲存到照片」或「加入照片」。";
     els.savePanel.classList.add("show");
     els.savePanel.scrollIntoView({ behavior: "smooth", block: "center" });
     setStatus("圖片已顯示在下方。", "ok");

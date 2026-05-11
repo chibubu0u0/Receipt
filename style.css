@@ -3782,3 +3782,48 @@ body.exporting-png .receipt {
     width: min(100%, 390px);
   }
 }
+
+
+/* Fix: receipt became fully black/transparent in some exports.
+   Export should remove the dark preview background, but the receipt paper itself must stay opaque. */
+body.exporting-png .capture-shell,
+body.exporting-png .capture-shell.receiptOnly {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+body.exporting-png .receipt-wrap {
+  background: transparent !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+body.exporting-png .receipt:not(.night) {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.035), transparent 12%, transparent 88%, rgba(0,0,0,.035)),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.018), rgba(0,0,0,.018) 1px, transparent 1px, transparent 4px),
+    var(--paper) !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+body.exporting-png .receipt.minimal {
+  background: #f9f8f4 !important;
+}
+
+body.exporting-png .receipt.night {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(235,226,210,.12), transparent 14rem),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025), rgba(255,255,255,.025) 1px, transparent 1px, transparent 4px),
+    #171717 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Make the exported bounding box include the torn bottom edge but not the black preview panel. */
+body.exporting-png .receipt-wrap {
+  padding: 16px 0 20px !important;
+}
