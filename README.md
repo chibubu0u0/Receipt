@@ -630,3 +630,16 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 若瀏覽器不支援，會自動下載 PNG 並提示手動到 Instagram 限動選圖
 
 注意：純網頁無法保證一鍵直接把圖片放入 Instagram 限動編輯器；這版採用最穩定的 Web Share API / 下載備援流程。
+
+
+## 透明背景 + 移除 IG 分享按鈕 + 版面修正版
+
+這版依需求調整：
+
+- 先移除「分享到 IG 限動」按鈕
+- 保留「下載／分享 PNG」按鈕
+- 方形與 IG 限動維持專用重新排版，不用長收據裁切
+- 方形 / IG 限動輸出時背景改成透明，不再有黑底
+- `html-to-image` 匯出時 `backgroundColor` 改成 `null`
+- 預覽區改成可捲動，避免桌機或手機預覽時被外層裁切
+- 方形與限動文字改成更緊湊的摘要排版，降低被裁切風險

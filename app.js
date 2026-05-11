@@ -9,7 +9,6 @@ const els = {
   generateBtn: document.getElementById("generateBtn"),
   demoBtn: document.getElementById("demoBtn"),
   downloadBtn: document.getElementById("downloadBtn"),
-  shareStoryBtn: document.getElementById("shareStoryBtn"),
   resetBtn: document.getElementById("resetBtn"),
   historyToggleBtn: document.getElementById("historyToggleBtn"),
   status: document.getElementById("status"),
@@ -129,6 +128,14 @@ function escapeHtml(value) {
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+function compactReceiptText(value, maxLength = 70) {
+  const text = sanitizeText(value, "").replace(/\s+/g, " ").trim();
+
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, Math.max(0, maxLength - 1))}…`;
+}
+
 
 function clampNumber(value, min = 0, max = 100) {
   const n = Number(value);
@@ -355,7 +362,7 @@ function buildSquareReceiptHtml(normalized) {
     <div class="square-object">
       <span>0${i + 1}</span>
       <strong>${escapeHtml(item.name)}</strong>
-      <small>${escapeHtml(item.meaning)}</small>
+      <small>${escapeHtml(compactReceiptText(item.meaning, 26))}</small>
     </div>
   `).join("");
 
@@ -369,8 +376,8 @@ function buildSquareReceiptHtml(normalized) {
   return `
     <section class="square-hero">
       <div class="square-kicker">AI EMOTIONAL CHECKOUT</div>
-      <h3>${escapeHtml(normalized.tagline)}</h3>
-      <p>${escapeHtml(normalized.soul)}</p>
+      <h3>${escapeHtml(compactReceiptText(normalized.tagline, 18))}</h3>
+      <p>${escapeHtml(compactReceiptText(normalized.soul, 62))}</p>
     </section>
 
     <section class="square-mini-section">
@@ -397,7 +404,7 @@ function buildSquareReceiptHtml(normalized) {
 
     <section class="square-vibe">
       <strong>${escapeHtml(normalized.vibe)}</strong>
-      <span>${escapeHtml(normalized.closing)}</span>
+      <span>${escapeHtml(compactReceiptText(normalized.closing, 34))}</span>
     </section>
   `;
 }
@@ -424,7 +431,7 @@ function buildStoryReceiptHtml(normalized) {
       <span>0${i + 1}</span>
       <div>
         <strong>${escapeHtml(item.name)}</strong>
-        <small>${escapeHtml(item.meaning)}</small>
+        <small>${escapeHtml(compactReceiptText(item.meaning, 38))}</small>
       </div>
     </div>
   `).join("");
@@ -439,8 +446,8 @@ function buildStoryReceiptHtml(normalized) {
   return `
     <section class="story-top">
       <div class="story-kicker">FOR IG STORY · SONG RECEIPT</div>
-      <h3>${escapeHtml(normalized.tagline)}</h3>
-      <p>${escapeHtml(normalized.soul)}</p>
+      <h3>${escapeHtml(compactReceiptText(normalized.tagline, 24))}</h3>
+      <p>${escapeHtml(compactReceiptText(normalized.soul, 108))}</p>
     </section>
 
     <section class="story-panel">
@@ -468,7 +475,7 @@ function buildStoryReceiptHtml(normalized) {
       <div class="story-checkout">${itemHtml}</div>
       <div class="story-vibe">
         <strong>${escapeHtml(normalized.vibe)}</strong>
-        <span>${escapeHtml(normalized.closing)}</span>
+        <span>${escapeHtml(compactReceiptText(normalized.closing, 52))}</span>
       </div>
     </section>
   `;
@@ -1185,7 +1192,7 @@ async function downloadPng() {
     const dataUrl = await window.htmlToImage.toPng(node, {
       pixelRatio: 3,
       cacheBust: true,
-      backgroundColor: els.sizeSelect.value === "receiptOnly" ? null : "#0d0d0d"
+      backgroundColor: null
     });
 
     const filename = els.sizeSelect.value === "story"
@@ -1220,74 +1227,6 @@ async function downloadPng() {
   } catch (error) {
     console.error(error);
     setStatus(error.message || "圖片產生失敗，請換 Chrome 或 Safari 再試。", "error");
-  }
-}
-
-
-async function shareToInstagramStory() {
-  if (!window.htmlToImage) {
-    setStatus("圖片輸出套件尚未載入完成，請確認網路後重新整理。", "error");
-    return;
-  }
-
-  const previousSize = els.sizeSelect.value;
-
-  try {
-    els.shareStoryBtn.disabled = true;
-    els.downloadBtn.disabled = true;
-
-    // 先切換成 IG 限動專用 9:16 模板，再輸出圖片。
-    if (els.sizeSelect.value !== "story") {
-      els.sizeSelect.value = "story";
-      applySize();
-      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    }
-
-    setStatus("正在產生 IG 限動模板…");
-
-    const dataUrl = await window.htmlToImage.toPng(els.captureArea, {
-      pixelRatio: 3,
-      cacheBust: true,
-      backgroundColor: "#0d0d0d"
-    });
-
-    const filename = `song-receipt-ig-story-${Date.now()}.png`;
-    const file = dataUrlToFile(dataUrl, filename);
-
-    // 手機優先開啟系統分享選單；使用者可選 Instagram / Stories。
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        files: [file],
-        title: "Song Receipt IG Story",
-        text: "Song Receipt Studio"
-      });
-
-      setStatus("已開啟手機分享選單。請選擇 Instagram 或限時動態發布。", "ok");
-      return;
-    }
-
-    // 不支援分享檔案時，改成直接下載。
-    await forceDownloadPng(dataUrl, filename);
-    setStatus(isMobileDevice()
-      ? "此瀏覽器無法直接分享到 IG。已下載 IG 限動圖，請到 Instagram 限時動態選取圖片。"
-      : "IG 限動圖已下載。請傳到手機後分享到 Instagram 限時動態。",
-      "ok");
-  } catch (error) {
-    console.error(error);
-
-    if (error && error.name === "AbortError") {
-      setStatus("已取消分享。", "error");
-    } else {
-      setStatus(error.message || "IG 限動分享失敗，請改用下載 PNG。", "error");
-    }
-  } finally {
-    els.shareStoryBtn.disabled = false;
-    els.downloadBtn.disabled = false;
-
-    // 保留使用者剛剛已切到的 IG 限動預覽，不切回去，方便確認畫面。
-    if (previousSize !== "story") {
-      updateSizePreviewCards();
-    }
   }
 }
 
@@ -1334,7 +1273,6 @@ document.querySelectorAll(".size-card").forEach(card => {
 els.generateBtn.addEventListener("click", generateReceipt);
 els.demoBtn.addEventListener("click", loadDemo);
 els.downloadBtn.addEventListener("click", downloadPng);
-els.shareStoryBtn.addEventListener("click", shareToInstagramStory);
 els.resetBtn.addEventListener("click", resetApp);
 els.signInBtn.addEventListener("click", signIn);
 els.signUpBtn.addEventListener("click", signUp);

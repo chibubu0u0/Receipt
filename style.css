@@ -2893,13 +2893,229 @@ h1 {
   display: none;
 }
 
-.ig-story-btn {
-  background:
-    radial-gradient(circle at 20% 0%, rgba(235,226,210,.18), transparent 56%),
-    rgba(235,226,210,.09);
+/* Transparent export + responsive preview fix */
+.preview-panel {
+  overflow: auto;
+  place-items: start center;
 }
 
-.ig-story-btn::before {
-  content: "↗";
-  margin-right: 6px;
+.stage {
+  width: min(100%, 500px);
+}
+
+.capture-shell.square,
+.capture-shell.story {
+  background: transparent !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+}
+
+.capture-shell.square {
+  width: min(430px, 100%);
+  aspect-ratio: 1 / 1;
+  padding: 16px;
+}
+
+.capture-shell.story {
+  width: min(430px, 100%);
+  aspect-ratio: 9 / 16;
+  padding: 18px 14px;
+}
+
+.capture-shell.square .receipt-wrap,
+.capture-shell.story .receipt-wrap {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.capture-shell.square .receipt.square-receipt,
+.capture-shell.story .receipt.story-receipt {
+  width: 100%;
+  height: 100%;
+  overflow: visible !important;
+  box-shadow:
+    0 22px 50px rgba(0,0,0,.24),
+    inset 0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.capture-shell.square .receipt.square-receipt {
+  padding: 19px;
+  border-radius: 28px;
+}
+
+.capture-shell.story .receipt.story-receipt {
+  padding: 24px 22px 22px;
+  border-radius: 34px;
+}
+
+.square-body,
+.story-body {
+  overflow: visible !important;
+}
+
+.square-body .square-hero p,
+.square-body .square-object small,
+.square-body .square-vibe span,
+.story-top p,
+.story-wave-panel p,
+.story-color-card small,
+.story-object small,
+.story-vibe span {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+  overflow: visible !important;
+}
+
+/* Square: tighter but not visually cropped */
+.square-body {
+  gap: 6px;
+}
+
+.square-body .square-hero h3 {
+  font-size: 16px;
+}
+
+.square-body .square-hero p {
+  font-size: 8.4px;
+  line-height: 1.32;
+}
+
+.square-body .square-mini-section {
+  gap: 4px;
+  padding-top: 5px;
+}
+
+.square-body .square-emotion-chip {
+  padding: 4px 3px;
+}
+
+.square-body .square-emotion-chip span {
+  font-size: 6.5px;
+}
+
+.square-body .square-emotion-chip strong {
+  font-size: 10px;
+}
+
+.square-body svg[aria-label="旋律輪廓"] {
+  height: 34px;
+}
+
+.square-body .square-bottom-grid {
+  gap: 7px;
+  padding-top: 5px;
+}
+
+.square-body .square-object strong {
+  font-size: 8px;
+}
+
+.square-body .square-object small {
+  font-size: 6.6px;
+  line-height: 1.18;
+}
+
+.square-body .square-item-row {
+  font-size: 7.5px;
+}
+
+.square-body .square-vibe strong {
+  font-size: 12px;
+}
+
+.square-body .square-vibe span {
+  font-size: 7px;
+}
+
+/* Story: fixed 9:16 template that fits mobile and desktop preview */
+.story-body {
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.story-top h3 {
+  font-size: 23px;
+}
+
+.story-top p {
+  font-size: 9.7px;
+  line-height: 1.38;
+}
+
+.story-panel {
+  gap: 6px;
+  padding-top: 7px;
+}
+
+.story-emotion-row {
+  grid-template-columns: 42px 1fr 28px;
+  gap: 7px;
+  font-size: 8px;
+}
+
+.story-wave-panel svg[aria-label="旋律輪廓"] {
+  height: 46px;
+}
+
+.story-wave-panel p {
+  font-size: 7.8px;
+}
+
+.story-color-card span {
+  height: 15px;
+}
+
+.story-color-card small {
+  font-size: 6.5px;
+}
+
+.story-objects {
+  gap: 5px;
+}
+
+.story-object {
+  grid-template-columns: 18px 1fr;
+  gap: 6px;
+}
+
+.story-object strong {
+  font-size: 8.8px;
+}
+
+.story-object small {
+  font-size: 6.8px;
+  line-height: 1.18;
+}
+
+.story-bottom {
+  gap: 7px;
+}
+
+.story-checkout-row {
+  font-size: 7.5px;
+}
+
+.story-vibe strong {
+  font-size: 15px;
+}
+
+.story-vibe span {
+  font-size: 7.2px;
+}
+
+@media (max-width: 560px) {
+  .preview-panel {
+    overflow-x: auto;
+  }
+
+  .capture-shell.square,
+  .capture-shell.story {
+    width: min(100%, 390px);
+  }
+
+  .capture-shell.story {
+    padding: 16px 12px;
+  }
 }
