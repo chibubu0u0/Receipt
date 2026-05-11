@@ -896,7 +896,7 @@ async function generateReceipt() {
     return;
   }
 
-  setStatus("分析中：正在把歌曲拆成情緒、色彩、物件與收據明細…");
+  setStatus("先確認歌曲是否存在；確認後才會扣點並開始分析…");
   els.generateBtn.disabled = true;
 
   try {
@@ -918,6 +918,16 @@ async function generateReceipt() {
 
     if (!response.ok) {
       const message = result && result.error ? result.error : `後端 API 回應失敗：${response.status}`;
+
+      if (result && result.code === "song_not_found") {
+        if (typeof result.remainingCredits === "number") {
+          setAuthState(currentSession, result.remainingCredits);
+        }
+
+        setStatus(message, "error");
+        return;
+      }
+
       throw new Error(message);
     }
 
@@ -927,8 +937,11 @@ async function generateReceipt() {
 
     const normalized = normalizeData(result.data);
 
-    renderReceipt(normalized, { artist, song });
-    saveHistory({ artist, song, data: normalized, createdAt: new Date().toISOString() });
+    const displayArtist = result.verifiedSong && result.verifiedSong.artist ? result.verifiedSong.artist : artist;
+    const displaySong = result.verifiedSong && result.verifiedSong.song ? result.verifiedSong.song : song;
+
+    renderReceipt(normalized, { artist: displayArtist, song: displaySong });
+    saveHistory({ artist: displayArtist, song: displaySong, data: normalized, createdAt: new Date().toISOString() });
 
     if (typeof result.remainingCredits === "number") {
       currentIsAdmin = Boolean(result.isAdmin);

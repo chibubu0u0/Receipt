@@ -191,6 +191,251 @@ async function updateCredits(userId, remainingCredits) {
   return Array.isArray(updated) && updated[0] ? updated[0].remaining_credits : remainingCredits;
 }
 
+
+function normalizeForCompare(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/\b(feat|ft|featuring)\.?\b/g, " ")
+    .replace(/\(.*?\)|\[.*?\]|（.*?）|【.*?】/g, " ")
+    .replace(/['’`´"]/g, "")
+    .replace(/[^a-z0-9\u3040-\u30ff\u3400-\u9fff]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function compactForCompare(value) {
+  return normalizeForCompare(value).replace(/\s+/g, "");
+}
+
+function levenshteinSimilarity(a, b) {
+  const left = compactForCompare(a);
+  const right = compactForCompare(b);
+
+  if (!left || !right) return 0;
+  if (left === right) return 1;
+
+  const rows = left.length + 1;
+  const cols = right.length + 1;
+  const dp = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+  for (let i = 0; i < rows; i++) dp[i][0] = i;
+  for (let j = 0; j < cols; j++) dp[0][j] = j;
+
+  for (let i = 1; i < rows; i++) {
+    for (let j = 1; j < cols; j++) {
+      const cost = left[i - 1] === right[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + cost
+      );
+    }
+  }
+
+  const distance = dp[left.length][right.length];
+  return 1 - distance / Math.max(left.length, right.length);
+}
+
+function textMatchScore(input, candidate) {
+  const inputNorm = normalizeForCompare(input);
+  const candidateNorm = normalizeForCompare(candidate);
+  const inputCompact = compactForCompare(input);
+  const candidateCompact = compactForCompare(candidate);
+
+  if (!inputNorm || !candidateNorm) return 0;
+  if (inputCompact === candidateCompact) return 1;
+
+  const withoutVersion = candidateNorm
+    .replace(/\b(remaster(ed)?|live|acoustic|radio edit|single version|album version|explicit|clean)\b/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+  const withoutVersionCompact = withoutVersion.replace(/\s+/g, "");
+
+  if (inputCompact === withoutVersionCompact) return 0.96;
+  if (candidateCompact.includes(inputCompact) || inputCompact.includes(candidateCompact)) return 0.86;
+
+  return levenshteinSimilarity(input, candidate);
+}
+
+function artistMatchScore(input, candidate) {
+  const inputNorm = normalizeForCompare(input);
+  const candidateNorm = normalizeForCompare(candidate);
+  const inputCompact = compactForCompare(input);
+  const candidateCompact = compactForCompare(candidate);
+
+  if (!inputNorm || !candidateNorm) return 0;
+  if (inputCompact === candidateCompact) return 1;
+  if (candidateCompact.includes(inputCompact) || inputCompact.includes(candidateCompact)) return 0.82;
+
+  return levenshteinSimilarity(input, candidate);
+}
+
+function scoreCandidate(inputArtist, inputSong, candidate) {
+  const titleScore = textMatchScore(inputSong, candidate.song);
+  const artistScore = artistMatchScore(inputArtist, candidate.artist);
+  const totalScore = titleScore * 0.68 + artistScore * 0.32;
+
+  return {
+    ...candidate,
+    titleScore,
+    artistScore,
+    totalScore
+  };
+}
+
+function isAcceptedSongMatch(scored) {
+  if (!scored) return false;
+
+  // 歌名要相當接近，歌手至少要有合理關聯；避免只因曲名常見而誤判。
+  if (scored.titleScore >= 0.93 && scored.artistScore >= 0.45) return true;
+  if (scored.titleScore >= 0.82 && scored.artistScore >= 0.72) return true;
+  if (scored.titleScore >= 0.76 && scored.artistScore >= 0.86) return true;
+
+  return false;
+}
+
+function uniqueCandidates(candidates) {
+  const seen = new Set();
+  const results = [];
+
+  for (const item of candidates) {
+    const key = `${compactForCompare(item.artist)}::${compactForCompare(item.song)}`;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    results.push(item);
+  }
+
+  return results;
+}
+
+async function searchITunesSong(artist, song) {
+  const url = new URL("https://itunes.apple.com/search");
+  url.searchParams.set("term", `${artist} ${song}`);
+  url.searchParams.set("entity", "song");
+  url.searchParams.set("limit", "12");
+  url.searchParams.set("country", "TW");
+
+  const response = await fetch(url, {
+    headers: {
+      "Accept": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`iTunes Search failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  return Array.isArray(data.results)
+    ? data.results
+        .filter(item => item.wrapperType === "track" && item.kind === "song")
+        .map(item => ({
+          artist: item.artistName || "",
+          song: item.trackName || "",
+          album: item.collectionName || "",
+          source: "iTunes"
+        }))
+    : [];
+}
+
+async function searchMusicBrainzSong(artist, song) {
+  const query = `recording:"${song.replace(/"/g, "")}" AND artist:"${artist.replace(/"/g, "")}"`;
+  const url = new URL("https://musicbrainz.org/ws/2/recording/");
+  url.searchParams.set("query", query);
+  url.searchParams.set("fmt", "json");
+  url.searchParams.set("limit", "10");
+
+  const response = await fetch(url, {
+    headers: {
+      "Accept": "application/json",
+      "User-Agent": "SongReceiptStudio/1.0 (https://receipt-six-tau.vercel.app)"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`MusicBrainz Search failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  return Array.isArray(data.recordings)
+    ? data.recordings.map(item => ({
+        artist: Array.isArray(item["artist-credit"])
+          ? item["artist-credit"].map(credit => credit.artist && credit.artist.name ? credit.artist.name : credit.name || "").filter(Boolean).join(" / ")
+          : "",
+        song: item.title || "",
+        album: Array.isArray(item.releases) && item.releases[0] ? item.releases[0].title || "" : "",
+        source: "MusicBrainz"
+      }))
+    : [];
+}
+
+async function validateSongExists(artist, song) {
+  const searchTasks = [
+    searchITunesSong(artist, song).catch(error => {
+      console.warn("iTunes validation failed:", error.message);
+      return [];
+    }),
+    searchMusicBrainzSong(artist, song).catch(error => {
+      console.warn("MusicBrainz validation failed:", error.message);
+      return [];
+    })
+  ];
+
+  const results = (await Promise.all(searchTasks)).flat();
+  const candidates = uniqueCandidates(results)
+    .map(candidate => scoreCandidate(artist, song, candidate))
+    .sort((a, b) => b.totalScore - a.totalScore);
+
+  const best = candidates[0] || null;
+
+  if (isAcceptedSongMatch(best)) {
+    return {
+      found: true,
+      canonical: {
+        artist: best.artist,
+        song: best.song,
+        album: best.album || "",
+        source: best.source
+      },
+      suggestions: candidates.slice(0, 3)
+    };
+  }
+
+  return {
+    found: false,
+    canonical: null,
+    suggestions: candidates
+      .filter(item => item.titleScore >= 0.35 || item.artistScore >= 0.5)
+      .slice(0, 3)
+      .map(item => ({
+        artist: item.artist,
+        song: item.song,
+        album: item.album || "",
+        source: item.source
+      }))
+  };
+}
+
+function makeSongNotFoundMessage(artist, song, suggestions = []) {
+  const base = `查無此歌曲，這次不會扣除生成次數。\n請確認「歌名」欄位輸入的是歌曲名稱，不是歌手名、專輯名或歌詞片段。`;
+
+  if (!suggestions.length) {
+    return `${base}\n你要的是「${song}」這首歌嗎？如果是，請確認歌手與歌名拼字後再試一次。`;
+  }
+
+  const suggestionText = suggestions
+    .map((item, index) => `${index + 1}. ${item.artist} - ${item.song}`)
+    .join("\n");
+
+  return `${base}\n你要的是下面其中一首歌嗎？\n${suggestionText}`;
+}
+
+
 function buildInstructions(depth, note) {
   const depthRule = {
     standard: "分析清楚、詩意但不要過度艱澀，適合一般社群分享。",
@@ -256,14 +501,6 @@ export default async function handler(req, res) {
 
   try {
     const user = await getUserFromToken(req);
-    const currentCredits = await getOrCreateCredits(user.id);
-
-    if (currentCredits <= 0) {
-      return res.status(402).json({
-        error: "你的生成次數已用完。下一步可以接付款系統來購買次數。",
-        remainingCredits: 0
-      });
-    }
 
     const body = req.body || {};
     const artist = String(body.artist || "").trim();
@@ -275,6 +512,31 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "請輸入歌手與歌名。" });
     }
 
+    const validation = await validateSongExists(artist, song);
+
+    if (!validation.found) {
+      const currentCredits = await getOrCreateCredits(user.id);
+
+      return res.status(404).json({
+        code: "song_not_found",
+        error: makeSongNotFoundMessage(artist, song, validation.suggestions),
+        suggestions: validation.suggestions,
+        remainingCredits: currentCredits
+      });
+    }
+
+    const currentCredits = await getOrCreateCredits(user.id);
+
+    if (currentCredits <= 0) {
+      return res.status(402).json({
+        error: "你的生成次數已用完。若需要更多次數，請私訊 Instagram 或寄信聯絡。",
+        remainingCredits: 0
+      });
+    }
+
+    const verifiedArtist = validation.canonical && validation.canonical.artist ? validation.canonical.artist : artist;
+    const verifiedSong = validation.canonical && validation.canonical.song ? validation.canonical.song : song;
+
     const openaiResponse = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -284,7 +546,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: OPENAI_MODEL,
         instructions: buildInstructions(depth, note),
-        input: `請分析：歌手「${artist}」，歌曲「${song}」。`,
+        input: `請分析：歌手「${verifiedArtist}」，歌曲「${verifiedSong}」。此歌曲已通過資料庫存在性檢查，請以此正式歌曲資訊分析。`,
         temperature: depth === "director" ? 0.98 : 0.88,
         max_output_tokens: 2200,
         store: false,
@@ -341,7 +603,7 @@ export default async function handler(req, res) {
         user_id: user.id,
         type: "generation",
         amount: -1,
-        reason: `${artist} - ${song}`
+        reason: `${verifiedArtist} - ${verifiedSong}`
       })
     });
 
@@ -349,14 +611,15 @@ export default async function handler(req, res) {
       method: "POST",
       body: JSON.stringify({
         user_id: user.id,
-        artist,
-        song,
+        artist: verifiedArtist,
+        song: verifiedSong,
         result_json: data
       })
     });
 
     return res.status(200).json({
       data,
+      verifiedSong: { artist: verifiedArtist, song: verifiedSong },
       remainingCredits
     });
   } catch (error) {
