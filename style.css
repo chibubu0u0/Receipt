@@ -3631,3 +3631,69 @@ h1 {
     font-size: 7.4px;
   }
 }
+
+
+/* Download/export fix: no black edge, no crop, transparent canvas */
+body.exporting-png .capture-shell,
+body.exporting-png .capture-shell.square,
+body.exporting-png .capture-shell.story {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: 0 !important;
+  overflow: hidden !important;
+}
+
+body.exporting-png .capture-shell.square {
+  padding: 28px !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+body.exporting-png .capture-shell.story {
+  padding: 30px 22px !important;
+  aspect-ratio: 9 / 16 !important;
+}
+
+body.exporting-png .capture-shell.square .receipt-wrap,
+body.exporting-png .capture-shell.story .receipt-wrap,
+body.exporting-png .receipt-wrap {
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+body.exporting-png .receipt,
+body.exporting-png .receipt.square-receipt,
+body.exporting-png .receipt.story-receipt {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Normal preview: keep inside the panel without hidden clipping */
+.capture-shell.square {
+  padding: 24px !important;
+  overflow: visible !important;
+}
+
+.capture-shell.square .receipt-wrap {
+  filter: none !important;
+}
+
+.capture-shell.square .receipt.square-receipt {
+  box-shadow: 0 12px 32px rgba(0,0,0,.16) !important;
+}
+
+/* Desktop/mobile preview scaling */
+@media (max-width: 760px) {
+  .stage {
+    width: 100%;
+  }
+
+  .capture-shell.square {
+    width: min(100%, 360px) !important;
+    padding: 16px !important;
+  }
+
+  .capture-shell.story {
+    width: min(100%, 360px) !important;
+  }
+}

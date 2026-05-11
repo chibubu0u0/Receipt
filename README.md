@@ -672,3 +672,15 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
   - 3 個歌曲具現化摘要
   - 整體氛圍與 closing
 - 以更密集的兩欄 / 表格式設計呈現，避免感覺內容太空
+
+
+## 方形下載裁切與黑邊修正版
+
+這版針對下載時的問題修正：
+
+- 下載 PNG 時會暫時啟用 `exporting-png` 模式
+- 匯出時移除黑色背景、黑色陰影與外框
+- 方形與限動輸出都使用透明背景
+- 方形匯出時增加透明安全邊距，避免內容被裁切
+- 匯出時指定實際節點寬高，降低 html-to-image 裁切問題
+- 方形下載檔名改成 `song-receipt-square-時間.png`

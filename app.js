@@ -1196,28 +1196,43 @@ async function downloadPng() {
     return;
   }
 
-  setStatus("正在輸出 PNG…");
+  setStatus("正在輸出透明 PNG…");
   els.savePanel.classList.remove("show");
 
+  // 匯出時暫時移除黑色外框、陰影與預覽用背景，避免下載圖出現黑邊或被陰影裁切。
+  document.body.classList.add("exporting-png");
+
   try {
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
     const node = els.captureArea;
+    const rect = node.getBoundingClientRect();
     const dataUrl = await window.htmlToImage.toPng(node, {
       pixelRatio: 3,
       cacheBust: true,
-      backgroundColor: null
+      backgroundColor: null,
+      width: Math.ceil(rect.width),
+      height: Math.ceil(rect.height),
+      style: {
+        background: "transparent"
+      }
     });
 
     const filename = els.sizeSelect.value === "story"
       ? `song-receipt-ig-story-${Date.now()}.png`
-      : `song-receipt-${Date.now()}.png`;
+      : els.sizeSelect.value === "square"
+        ? `song-receipt-square-${Date.now()}.png`
+        : `song-receipt-${Date.now()}.png`;
 
     // Android 與電腦版：直接下載到裝置，不走 Web Share API。
     // iOS / iPadOS 對瀏覽器下載限制較多，所以保留分享 / 長按儲存流程。
     if (!isIosDevice()) {
       await forceDownloadPng(dataUrl, filename);
       setStatus(els.sizeSelect.value === "story"
-        ? (isMobileDevice() ? "IG 限時動態模板已下載，請到手機「下載」資料夾，再分享到 Instagram。" : "IG 限時動態模板 PNG 已直接下載，背景為透明。")
-        : (isMobileDevice() ? "PNG 已下載，請到手機的「下載」資料夾查看。" : "PNG 已直接下載，背景為透明。"),
+        ? (isMobileDevice() ? "IG 限時動態模板已下載，背景為透明。請到手機「下載」資料夾查看。" : "IG 限時動態模板 PNG 已直接下載，背景為透明。")
+        : els.sizeSelect.value === "square"
+          ? (isMobileDevice() ? "方形透明 PNG 已下載，請到手機「下載」資料夾查看。" : "方形透明 PNG 已直接下載。")
+          : (isMobileDevice() ? "PNG 已下載，請到手機的「下載」資料夾查看。" : "PNG 已直接下載，背景為透明。"),
         "ok");
       return;
     }
@@ -1232,16 +1247,17 @@ async function downloadPng() {
     }
 
     els.saveImage.src = dataUrl;
-    els.savePanelText.textContent = "圖片已產生。請長按圖片，選擇「儲存到照片」或「加入照片」。";
+    els.savePanelText.textContent = "透明 PNG 已產生。請長按圖片，選擇「儲存到照片」或「加入照片」。";
     els.savePanel.classList.add("show");
     els.savePanel.scrollIntoView({ behavior: "smooth", block: "center" });
     setStatus("圖片已顯示在下方。", "ok");
   } catch (error) {
     console.error(error);
     setStatus(error.message || "圖片產生失敗，請換 Chrome 或 Safari 再試。", "error");
+  } finally {
+    document.body.classList.remove("exporting-png");
   }
 }
-
 
 function loadDemo() {
   els.artist.value = "Taylor Swift";
