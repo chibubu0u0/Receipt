@@ -101,6 +101,7 @@ const demoData = {
 
 let currentDepth = "standard";
 let currentData = demoData;
+let currentMeta = { artist: "Demo Artist", song: "Demo Song" };
 let supabaseClient = null;
 let currentSession = null;
 let currentCredits = null;
@@ -254,13 +255,7 @@ function makeBarcode(values) {
   }).join("");
 }
 
-function renderReceipt(data, meta = {}) {
-  const normalized = normalizeData(data);
-  currentData = normalized;
-
-  els.receiptSong.textContent = sanitizeText(meta.song || els.song.value, "尚未選擇歌曲");
-  els.receiptArtist.textContent = sanitizeText(meta.artist || els.artist.value, "Unknown Artist");
-
+function buildFullReceiptHtml(normalized) {
   const emotionHtml = normalized.emotions.map(item => `
     <div class="emotion-item">
       <div class="icon-box">${icon(item.icon)}</div>
@@ -298,7 +293,7 @@ function renderReceipt(data, meta = {}) {
     </tr>
   `).join("");
 
-  els.receiptBody.innerHTML = `
+  return `
     <section class="section">
       <div class="section-label"><span>靈魂解讀</span><span>01</span></div>
       <p class="soul">${escapeHtml(normalized.soul)}</p>
@@ -316,7 +311,7 @@ function renderReceipt(data, meta = {}) {
     </section>
 
     <section class="section">
-      <div class="section-label"><span>旋律輪廓</span><span>04</span></div>
+      <div class="section-label"><span>情緒輪廓</span><span>04</span></div>
       ${makeMelodySvg(normalized.melody, normalized.colors)}
       <p class="melody-label">${escapeHtml(normalized.melody.label)}</p>
     </section>
@@ -343,6 +338,90 @@ function renderReceipt(data, meta = {}) {
   `;
 }
 
+function buildSquareReceiptHtml(normalized) {
+  const emotionHtml = normalized.emotions.slice(0, 4).map(item => `
+    <div class="square-emotion-chip">
+      <span>${escapeHtml(item.label)}</span>
+      <strong>${item.value}</strong>
+    </div>
+  `).join("");
+
+  const colorHtml = normalized.colors.slice(0, 3).map(item => `
+    <span class="square-color" style="--c:${item.hex}" title="${escapeHtml(item.name)}"></span>
+  `).join("");
+
+  const objectHtml = normalized.objects.slice(0, 2).map((item, i) => `
+    <div class="square-object">
+      <span>0${i + 1}</span>
+      <strong>${escapeHtml(item.name)}</strong>
+      <small>${escapeHtml(item.meaning)}</small>
+    </div>
+  `).join("");
+
+  const itemHtml = normalized.items.slice(0, 3).map(item => `
+    <div class="square-item-row">
+      <span>${escapeHtml(item.name)}</span>
+      <strong>${item.intensity}%</strong>
+    </div>
+  `).join("");
+
+  return `
+    <section class="square-hero">
+      <div class="square-kicker">AI EMOTIONAL CHECKOUT</div>
+      <h3>${escapeHtml(normalized.tagline)}</h3>
+      <p>${escapeHtml(normalized.soul)}</p>
+    </section>
+
+    <section class="square-mini-section">
+      <div class="square-section-head"><span>情緒濃度</span><span>01</span></div>
+      <div class="square-emotions">${emotionHtml}</div>
+    </section>
+
+    <section class="square-mini-section">
+      <div class="square-section-head"><span>色彩與情緒輪廓</span><span>02</span></div>
+      <div class="square-colors">${colorHtml}</div>
+      ${makeMelodySvg(normalized.melody, normalized.colors)}
+    </section>
+
+    <section class="square-bottom-grid">
+      <div>
+        <div class="square-section-head"><span>具現化</span><span>03</span></div>
+        <div class="square-objects">${objectHtml}</div>
+      </div>
+      <div>
+        <div class="square-section-head"><span>結帳摘要</span><span>04</span></div>
+        <div class="square-items">${itemHtml}</div>
+      </div>
+    </section>
+
+    <section class="square-vibe">
+      <strong>${escapeHtml(normalized.vibe)}</strong>
+      <span>${escapeHtml(normalized.closing)}</span>
+    </section>
+  `;
+}
+
+function renderReceipt(data, meta = {}) {
+  const normalized = normalizeData(data);
+  currentData = normalized;
+
+  currentMeta = {
+    artist: sanitizeText(meta.artist || els.artist.value || currentMeta.artist || "Demo Artist", "Demo Artist"),
+    song: sanitizeText(meta.song || els.song.value || currentMeta.song || "Demo Song", "Demo Song")
+  };
+
+  els.receiptSong.textContent = sanitizeText(currentMeta.song, "尚未選擇歌曲");
+  els.receiptArtist.textContent = sanitizeText(currentMeta.artist, "Unknown Artist");
+
+  const isSquare = els.sizeSelect && els.sizeSelect.value === "square";
+  els.receipt.classList.toggle("square-receipt", isSquare);
+  els.receiptBody.classList.toggle("square-body", isSquare);
+
+  els.receiptBody.innerHTML = isSquare
+    ? buildSquareReceiptHtml(normalized)
+    : buildFullReceiptHtml(normalized);
+}
+
 function applyTheme() {
   els.receipt.classList.remove("minimal", "night");
   els.captureArea.classList.remove("theme-thermal", "theme-minimal", "theme-night");
@@ -358,10 +437,14 @@ function updateSizePreviewCards() {
   });
 }
 
-function applySize() {
+function applySize(options = {}) {
   const themeClass = `theme-${els.themeSelect.value}`;
   els.captureArea.className = `capture-shell ${els.sizeSelect.value} ${themeClass}`;
   updateSizePreviewCards();
+
+  if (!options.skipRender && currentData) {
+    renderReceipt(currentData, currentMeta);
+  }
 }
 
 function getHistory() {
@@ -1068,7 +1151,7 @@ function resetApp() {
   els.listenerNote.value = "";
   els.savePanel.classList.remove("show");
   renderReceipt(demoData, { artist: "Demo Artist", song: "Demo Song" });
-applySize();
+applySize({ skipRender: true });
   setStatus("已清空輸入，保留範例預覽。", "ok");
 }
 
@@ -1121,4 +1204,4 @@ els.themeSelect.addEventListener("change", () => {
 els.sizeSelect.addEventListener("change", applySize);
 
 renderReceipt(demoData, { artist: "Demo Artist", song: "Demo Song" });
-applySize();
+applySize({ skipRender: true });

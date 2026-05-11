@@ -7,6 +7,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="./style.css" />
+  <!-- Google AdSense｜Auto ads -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3722117276540924"
+     crossorigin="anonymous"></script>
 </head>
 <body>
   
@@ -162,26 +165,14 @@
             </div>
           </div>
         </div>
-
-
-        <div class="mode-preview-wrap">
-          <div class="control-label">分析模式預覽</div>
-          <div class="tabs mode-preview-grid" aria-label="分析模式">
-            <button class="tab mode-card active" data-depth="standard" type="button">
-              <span class="mode-card-title">標準分析</span>
-              <span class="mode-card-desc">清楚、好讀，適合快速生成社群小票。</span>
-              <span class="mode-card-sample">情緒 / 色彩 / 具現化</span>
-            </button>
-            <button class="tab mode-card" data-depth="deep" type="button">
-              <span class="mode-card-title">深層進化</span>
-              <span class="mode-card-desc">更細緻的心理狀態、場景與物件隱喻。</span>
-              <span class="mode-card-sample">記憶場景 / 物件符號 / 聽感層次</span>
-            </button>
-            <button class="tab mode-card" data-depth="director" type="button">
-              <span class="mode-card-title">導演版</span>
-              <span class="mode-card-desc">像 MV 分鏡，畫面感最強、色彩最戲劇化。</span>
-              <span class="mode-card-sample">鏡頭 / 光線 / 劇照式氛圍</span>
-            </button>
+        <div class="mode-preview-wrap single-analysis-wrap">
+          <div class="control-label">分析風格</div>
+          <div class="single-analysis-card">
+            <div>
+              <strong>情緒收據分析</strong>
+              <p>目前統一使用最穩定的分析模式：清楚好讀、保留畫面感，也避免模式差異不夠明顯造成混淆。</p>
+            </div>
+            <span>AI EMOTIONAL CHECKOUT</span>
           </div>
         </div>
 
@@ -247,7 +238,7 @@
         </div>
 
         <div class="hint">
-          小提示：點選上方模式與尺寸預覽即可切換。方形貼文會輸出真正 1:1 的摘要卡片；收據模式會保留完整長條內容。
+          小提示：方形貼文會重新排版成真正 1:1 的社群卡片，不是裁切長收據；收據模式會保留完整長條內容。
         </div>
         <div id="status" class="status"></div>
 
@@ -285,6 +276,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=mode-size-previews-1"></script>
+  <script src="./app.js?v=square-real-layout-fix-2"></script>
 </body>
 </html>

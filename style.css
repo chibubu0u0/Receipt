@@ -2031,3 +2031,565 @@ h1 {
     min-height: auto;
   }
 }
+
+
+.single-analysis-wrap {
+  margin: 12px 0 22px;
+}
+
+.single-analysis-card {
+  border: 1px solid rgba(235,226,210,.14);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(235,226,210,.16), transparent 56%),
+    rgba(235,226,210,.055);
+  border-radius: 24px;
+  padding: 18px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.single-analysis-card strong {
+  color: var(--cream);
+  font-size: 15px;
+}
+
+.single-analysis-card p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.single-analysis-card > span {
+  color: rgba(235,226,210,.55);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .18em;
+  white-space: nowrap;
+}
+
+.receipt-layout-square {
+  display: none;
+}
+
+.capture-shell.square {
+  width: min(430px, 100%);
+  aspect-ratio: 1 / 1;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  padding: 24px;
+  align-content: center;
+  background:
+    radial-gradient(circle at 12% 14%, rgba(235,226,210,.22), transparent 32%),
+    radial-gradient(circle at 88% 86%, rgba(255,255,255,.08), transparent 34%),
+    linear-gradient(145deg, #11100f, #1a1715 56%, #0d0d0d);
+}
+
+.capture-shell.square .receipt-wrap {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  filter: drop-shadow(0 18px 34px rgba(0,0,0,.34));
+}
+
+.capture-shell.square .receipt {
+  width: 100%;
+  height: 100%;
+  border-radius: 30px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.capture-shell.square .receipt::before,
+.capture-shell.square .receipt::after {
+  display: none;
+}
+
+.capture-shell.square .receipt-head {
+  padding-bottom: 9px;
+  margin-bottom: 10px;
+  flex: 0 0 auto;
+}
+
+.capture-shell.square .receipt-title {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.capture-shell.square .receipt-subtitle {
+  font-size: 8px;
+}
+
+.capture-shell.square .song-meta {
+  margin-top: 8px;
+}
+
+.capture-shell.square .song-name {
+  font-size: 15px;
+  line-height: 1.08;
+}
+
+.capture-shell.square .artist-name {
+  font-size: 9px;
+}
+
+.capture-shell.square .receipt-layout-full {
+  display: none;
+}
+
+.capture-shell.square .receipt-layout-square {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 8px;
+}
+
+.capture-shell.square .square-hero {
+  display: grid;
+  gap: 5px;
+}
+
+.capture-shell.square .square-kicker,
+.capture-shell.square .square-section-head {
+  color: var(--ink-2);
+  font-size: 7.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.capture-shell.square .square-hero h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.08;
+  letter-spacing: -.06em;
+}
+
+.capture-shell.square .square-hero p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 9.5px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.capture-shell.square .square-mini-section {
+  display: grid;
+  gap: 6px;
+  padding-top: 7px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+}
+
+.capture-shell.square .square-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.capture-shell.square .square-emotions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.capture-shell.square .square-emotion-chip {
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 999px;
+  padding: 6px 5px;
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+}
+
+.capture-shell.square .square-emotion-chip span {
+  color: var(--ink-2);
+  font-size: 7.5px;
+  line-height: 1;
+}
+
+.capture-shell.square .square-emotion-chip strong {
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.capture-shell.square .square-colors {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.capture-shell.square .square-color {
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  background: var(--c);
+}
+
+.capture-shell.square svg[aria-label="旋律輪廓"] {
+  height: 46px;
+}
+
+.capture-shell.square svg[aria-label="旋律輪廓"] text {
+  display: none;
+}
+
+.capture-shell.square .square-bottom-grid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: 8px;
+  padding-top: 7px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+}
+
+.capture-shell.square .square-objects,
+.capture-shell.square .square-items {
+  display: grid;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.capture-shell.square .square-object {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 4px 6px;
+}
+
+.capture-shell.square .square-object span {
+  grid-row: span 2;
+  color: var(--ink-2);
+  font-size: 8px;
+}
+
+.capture-shell.square .square-object strong {
+  color: var(--ink);
+  font-size: 9px;
+  line-height: 1.1;
+}
+
+.capture-shell.square .square-object small {
+  color: var(--ink-2);
+  font-size: 7.5px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.capture-shell.square .square-item-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 8.5px;
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink) 14%, transparent);
+  padding-bottom: 4px;
+}
+
+.capture-shell.square .square-item-row strong {
+  color: var(--ink);
+}
+
+.capture-shell.square .square-vibe {
+  padding-top: 7px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.capture-shell.square .square-vibe strong {
+  color: var(--ink);
+  font-size: 14px;
+  letter-spacing: -.04em;
+}
+
+.capture-shell.square .square-vibe span {
+  color: var(--ink-2);
+  font-size: 8px;
+  line-height: 1.3;
+  text-align: right;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.capture-shell.square .receipt-foot {
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .single-analysis-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .single-analysis-card > span {
+    white-space: normal;
+  }
+}
+
+
+/* Square output v2: 切到方形時，JS 會直接換成獨立 square DOM，不再裁切長收據 */
+.capture-shell.square {
+  width: min(430px, 100%);
+  aspect-ratio: 1 / 1;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+}
+
+.capture-shell.square .receipt-wrap {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.capture-shell.square .receipt.square-receipt {
+  width: 100%;
+  height: 100%;
+  padding: 22px;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.capture-shell.square .receipt.square-receipt::before,
+.capture-shell.square .receipt.square-receipt::after {
+  display: none !important;
+}
+
+.capture-shell.square .receipt.square-receipt .receipt-head {
+  flex: 0 0 auto;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.capture-shell.square .receipt.square-receipt .receipt-title {
+  font-size: 19px;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.capture-shell.square .receipt.square-receipt .receipt-subtitle {
+  font-size: 7.5px;
+}
+
+.capture-shell.square .receipt.square-receipt .song-meta {
+  margin-top: 7px;
+}
+
+.capture-shell.square .receipt.square-receipt .song-name {
+  font-size: 15px;
+  line-height: 1.08;
+}
+
+.capture-shell.square .receipt.square-receipt .artist-name {
+  font-size: 9px;
+}
+
+.square-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 7px;
+}
+
+.square-body .square-hero {
+  display: grid;
+  gap: 4px;
+}
+
+.square-body .square-kicker,
+.square-body .square-section-head {
+  color: var(--ink-2);
+  font-size: 7px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.square-body .square-hero h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.06;
+  letter-spacing: -.06em;
+}
+
+.square-body .square-hero p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 9px;
+  line-height: 1.36;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.square-body .square-mini-section {
+  display: grid;
+  gap: 5px;
+  padding-top: 6px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+}
+
+.square-body .square-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.square-body .square-emotions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.square-body .square-emotion-chip {
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 999px;
+  padding: 5px 4px;
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+}
+
+.square-body .square-emotion-chip span {
+  color: var(--ink-2);
+  font-size: 7px;
+  line-height: 1;
+}
+
+.square-body .square-emotion-chip strong {
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.square-body .square-colors {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.square-body .square-color {
+  height: 11px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  background: var(--c);
+}
+
+.square-body svg[aria-label="旋律輪廓"] {
+  height: 42px;
+}
+
+.square-body svg[aria-label="旋律輪廓"] text {
+  display: none;
+}
+
+.square-body .square-bottom-grid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr .82fr;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+}
+
+.square-body .square-objects,
+.square-body .square-items {
+  display: grid;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.square-body .square-object {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 3px 5px;
+}
+
+.square-body .square-object span {
+  grid-row: span 2;
+  color: var(--ink-2);
+  font-size: 7.5px;
+}
+
+.square-body .square-object strong {
+  color: var(--ink);
+  font-size: 8.5px;
+  line-height: 1.1;
+}
+
+.square-body .square-object small {
+  color: var(--ink-2);
+  font-size: 7px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.square-body .square-item-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 8px;
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink) 14%, transparent);
+  padding-bottom: 3px;
+}
+
+.square-body .square-item-row strong {
+  color: var(--ink);
+}
+
+.square-body .square-vibe {
+  padding-top: 6px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.square-body .square-vibe strong {
+  color: var(--ink);
+  font-size: 13px;
+  letter-spacing: -.04em;
+}
+
+.square-body .square-vibe span {
+  color: var(--ink-2);
+  font-size: 7.5px;
+  line-height: 1.25;
+  text-align: right;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.capture-shell.square .receipt-foot {
+  display: none;
+}
