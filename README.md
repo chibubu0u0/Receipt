@@ -684,3 +684,17 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 方形匯出時增加透明安全邊距，避免內容被裁切
 - 匯出時指定實際節點寬高，降低 html-to-image 裁切問題
 - 方形下載檔名改成 `song-receipt-square-時間.png`
+
+
+## 收據紙單一格式 + 黑邊處理版
+
+這版依需求調整：
+
+- 刪除方形貼文格式
+- 刪除 IG 限時動態格式
+- 只保留完整長條收據紙輸出
+- 移除收據紙預覽與下載時的黑色陰影 / 黑邊
+- 下載 PNG 時維持透明背景
+- 匯出時啟用 export 模式，移除陰影、黑底與外框
+
+如果部署後仍看到黑邊，通常是瀏覽器快取、圖片檢視器透明背景顯示方式，或 html-to-image 對陰影 / outline 的渲染殘留。可嘗試強制重新整理、換瀏覽器測試，或把輸出節點從 captureArea 改成只輸出 receipt 本體。

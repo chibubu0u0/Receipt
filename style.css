@@ -3697,3 +3697,88 @@ body.exporting-png .receipt.story-receipt {
     width: min(100%, 360px) !important;
   }
 }
+
+
+/* Receipt-only mode */
+.output-format-note {
+  grid-column: 1 / -1;
+}
+
+.single-format-card {
+  border: 1px solid rgba(235,226,210,.12);
+  background: rgba(235,226,210,.055);
+  border-radius: 18px;
+  padding: 14px 15px;
+  display: grid;
+  gap: 5px;
+}
+
+.single-format-card strong {
+  color: var(--cream);
+  font-size: 13px;
+}
+
+.single-format-card span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.size-preview-grid,
+.size-card {
+  display: none !important;
+}
+
+/* Remove black edge/shadow around receipt paper */
+.capture-shell.receiptOnly,
+.capture-shell {
+  background: transparent !important;
+}
+
+.receipt-wrap {
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+.receipt {
+  box-shadow: none !important;
+}
+
+/* Keep a very light paper boundary without black outline */
+.receipt {
+  outline: 1px solid rgba(22,21,17,.06);
+  outline-offset: 0;
+}
+
+/* Export mode: transparent, no black edge, no shadow */
+body.exporting-png .capture-shell,
+body.exporting-png .capture-shell.receiptOnly,
+body.exporting-png .receipt-wrap,
+body.exporting-png .receipt {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+body.exporting-png .receipt {
+  outline: none !important;
+}
+
+/* Mobile/desktop receipt preview stability */
+.preview-panel {
+  overflow: auto;
+}
+
+.stage {
+  width: min(100%, 460px);
+}
+
+@media (max-width: 560px) {
+  .stage {
+    width: 100%;
+  }
+
+  .receipt-wrap {
+    width: min(100%, 390px);
+  }
+}

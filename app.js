@@ -506,20 +506,10 @@ function renderReceipt(data, meta = {}) {
   els.receiptSong.textContent = sanitizeText(currentMeta.song, "尚未選擇歌曲");
   els.receiptArtist.textContent = sanitizeText(currentMeta.artist, "Unknown Artist");
 
-  const size = els.sizeSelect ? els.sizeSelect.value : "receiptOnly";
-  const isSquare = size === "square";
-  const isStory = size === "story";
+  els.receipt.classList.remove("square-receipt", "story-receipt");
+  els.receiptBody.classList.remove("square-body", "story-body");
 
-  els.receipt.classList.toggle("square-receipt", isSquare);
-  els.receipt.classList.toggle("story-receipt", isStory);
-  els.receiptBody.classList.toggle("square-body", isSquare);
-  els.receiptBody.classList.toggle("story-body", isStory);
-
-  els.receiptBody.innerHTML = isStory
-    ? buildStoryReceiptHtml(normalized)
-    : isSquare
-      ? buildSquareReceiptHtml(normalized)
-      : buildFullReceiptHtml(normalized);
+  els.receiptBody.innerHTML = buildFullReceiptHtml(normalized);
 }
 
 function applyTheme() {
@@ -539,8 +529,8 @@ function updateSizePreviewCards() {
 
 function applySize(options = {}) {
   const themeClass = `theme-${els.themeSelect.value}`;
-  els.captureArea.className = `capture-shell ${els.sizeSelect.value} ${themeClass}`;
-  updateSizePreviewCards();
+  if (els.sizeSelect) els.sizeSelect.value = "receiptOnly";
+  els.captureArea.className = `capture-shell receiptOnly ${themeClass}`;
 
   if (!options.skipRender && currentData) {
     renderReceipt(currentData, currentMeta);
@@ -1218,21 +1208,15 @@ async function downloadPng() {
       }
     });
 
-    const filename = els.sizeSelect.value === "story"
-      ? `song-receipt-ig-story-${Date.now()}.png`
-      : els.sizeSelect.value === "square"
-        ? `song-receipt-square-${Date.now()}.png`
-        : `song-receipt-${Date.now()}.png`;
+    const filename = `song-receipt-${Date.now()}.png`;
 
     // Android 與電腦版：直接下載到裝置，不走 Web Share API。
     // iOS / iPadOS 對瀏覽器下載限制較多，所以保留分享 / 長按儲存流程。
     if (!isIosDevice()) {
       await forceDownloadPng(dataUrl, filename);
-      setStatus(els.sizeSelect.value === "story"
-        ? (isMobileDevice() ? "IG 限時動態模板已下載，背景為透明。請到手機「下載」資料夾查看。" : "IG 限時動態模板 PNG 已直接下載，背景為透明。")
-        : els.sizeSelect.value === "square"
-          ? (isMobileDevice() ? "方形透明 PNG 已下載，請到手機「下載」資料夾查看。" : "方形透明 PNG 已直接下載。")
-          : (isMobileDevice() ? "PNG 已下載，請到手機的「下載」資料夾查看。" : "PNG 已直接下載，背景為透明。"),
+      setStatus(isMobileDevice()
+        ? "收據 PNG 已下載，請到手機「下載」資料夾查看。"
+        : "收據 PNG 已直接下載，背景為透明。",
         "ok");
       return;
     }
@@ -1241,7 +1225,7 @@ async function downloadPng() {
     const file = dataUrlToFile(dataUrl, filename);
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: els.sizeSelect.value === "story" ? "Song Receipt IG Story" : "Song Receipt" });
+      await navigator.share({ files: [file], title: "Song Receipt" });
       setStatus("已開啟分享選單。", "ok");
       return;
     }
@@ -1288,16 +1272,6 @@ document.querySelectorAll(".tab").forEach(tab => {
   });
 });
 
-document.querySelectorAll(".size-card").forEach(card => {
-  card.addEventListener("click", () => {
-    els.sizeSelect.value = card.dataset.size;
-    applySize();
-
-    const label = card.querySelector("strong") ? card.querySelector("strong").textContent : card.dataset.size;
-    setStatus(`已切換輸出尺寸：「${label}」。`, "ok");
-  });
-});
-
 els.generateBtn.addEventListener("click", generateReceipt);
 els.demoBtn.addEventListener("click", loadDemo);
 els.downloadBtn.addEventListener("click", downloadPng);
@@ -1323,7 +1297,6 @@ els.themeSelect.addEventListener("change", () => {
   applySize();
 });
 
-els.sizeSelect.addEventListener("change", applySize);
 
 renderReceipt(demoData, { artist: "Demo Artist", song: "Demo Song" });
 applySize({ skipRender: true });

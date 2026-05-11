@@ -202,31 +202,15 @@
                 <option value="night">深夜黑票</option>
               </select>
             </div>
-            <div class="field">
-              <label for="sizeSelect">輸出尺寸</label>
-              <select id="sizeSelect">
-                <option value="receiptOnly">只輸出收據</option>
-                <option value="square">方形貼文</option>
-                <option value="story">IG 限時動態</option>
-              </select>
-
-              <div class="size-preview-grid" aria-label="輸出尺寸預覽">
-                <button class="size-card active" data-size="receiptOnly" type="button">
-                  <span class="size-thumb receipt-thumb"><i></i></span>
-                  <strong>收據</strong>
-                  <small>長條小票，保留完整內容</small>
-                </button>
-                <button class="size-card" data-size="square" type="button">
-                  <span class="size-thumb square-thumb"><i></i></span>
-                  <strong>方形</strong>
-                  <small>1:1 貼文卡片，摘要式呈現</small>
-                </button>
-                <button class="size-card" data-size="story" type="button">
-                  <span class="size-thumb story-thumb"><i></i></span>
-                  <strong>IG 限動</strong>
-                  <small>9:16 限動模板，重新排版不裁切</small>
-                </button>
+            <div class="field output-format-note">
+              <label>輸出格式</label>
+              <div class="single-format-card">
+                <strong>收據紙</strong>
+                <span>目前只保留完整長條收據格式，避免方形與限動排版被裁切或跑版。</span>
               </div>
+              <select id="sizeSelect" hidden aria-hidden="true">
+                <option value="receiptOnly" selected>只輸出收據</option>
+              </select>
             </div>
           </div>
         </div>
@@ -238,7 +222,7 @@
         </div>
 
         <div class="hint">
-          小提示：方形會保留更多資訊並重新排成 1:1 社群卡片；PNG 匯出為透明背景。
+          小提示：目前只保留完整收據紙格式；下載時會盡量移除黑邊、陰影與黑底，輸出透明 PNG。
         </div>
         <div id="status" class="status"></div>
 
@@ -276,6 +260,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=square-download-no-crop-1"></script>
+  <script src="./app.js?v=receipt-only-no-edge-1"></script>
 </body>
 </html>
