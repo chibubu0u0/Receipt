@@ -596,3 +596,24 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 已新增 `/ads.txt`
 
 如果你在 Google AdSense 後台開啟 Auto ads，Google 會自動判斷廣告位置；如果覺得太干擾，可以在 AdSense 後台降低或關閉 Auto ads 的自動插入位置。
+
+
+## IG 限時動態模板版
+
+這版新增 IG 限時動態專用輸出：
+
+- 「限時動態」改成「IG 限動」
+- 9:16 畫布比例
+- 切到 IG 限動時，JS 會產生獨立 story DOM，不沿用長收據，不裁切
+- 內容重新排版成適合限動的模板：
+  - 標語
+  - 靈魂摘要
+  - 情緒濃度
+  - 情緒輪廓
+  - 色彩語言
+  - 歌曲具現化
+  - 結帳摘要
+- 下載檔名會變成 `song-receipt-ig-story-時間.png`
+- 手機分享時標題會使用 `Song Receipt IG Story`
+
+注意：網頁不能保證直接發到 Instagram 限動；最穩定做法是下載 PNG 後，在 Instagram 限時動態選取圖片發布。

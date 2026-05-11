@@ -401,6 +401,79 @@ function buildSquareReceiptHtml(normalized) {
   `;
 }
 
+
+function buildStoryReceiptHtml(normalized) {
+  const emotionHtml = normalized.emotions.slice(0, 4).map(item => `
+    <div class="story-emotion-row">
+      <span>${escapeHtml(item.label)}</span>
+      <div><i style="--w:${item.value}%"></i></div>
+      <strong>${item.value}</strong>
+    </div>
+  `).join("");
+
+  const colorHtml = normalized.colors.slice(0, 3).map(item => `
+    <div class="story-color-card">
+      <span style="--c:${item.hex}"></span>
+      <small>${escapeHtml(item.name)}</small>
+    </div>
+  `).join("");
+
+  const objectHtml = normalized.objects.slice(0, 3).map((item, i) => `
+    <div class="story-object">
+      <span>0${i + 1}</span>
+      <div>
+        <strong>${escapeHtml(item.name)}</strong>
+        <small>${escapeHtml(item.meaning)}</small>
+      </div>
+    </div>
+  `).join("");
+
+  const itemHtml = normalized.items.slice(0, 3).map(item => `
+    <div class="story-checkout-row">
+      <span>${escapeHtml(item.name)}</span>
+      <strong>${item.intensity}%</strong>
+    </div>
+  `).join("");
+
+  return `
+    <section class="story-top">
+      <div class="story-kicker">FOR IG STORY · SONG RECEIPT</div>
+      <h3>${escapeHtml(normalized.tagline)}</h3>
+      <p>${escapeHtml(normalized.soul)}</p>
+    </section>
+
+    <section class="story-panel">
+      <div class="story-section-head"><span>情緒濃度</span><span>01</span></div>
+      <div class="story-emotions">${emotionHtml}</div>
+    </section>
+
+    <section class="story-panel story-wave-panel">
+      <div class="story-section-head"><span>情緒輪廓</span><span>02</span></div>
+      ${makeMelodySvg(normalized.melody, normalized.colors)}
+      <p>${escapeHtml(normalized.melody.label)}</p>
+    </section>
+
+    <section class="story-panel">
+      <div class="story-section-head"><span>色彩語言</span><span>03</span></div>
+      <div class="story-colors">${colorHtml}</div>
+    </section>
+
+    <section class="story-panel story-object-panel">
+      <div class="story-section-head"><span>歌曲具現化</span><span>04</span></div>
+      <div class="story-objects">${objectHtml}</div>
+    </section>
+
+    <section class="story-bottom">
+      <div class="story-checkout">${itemHtml}</div>
+      <div class="story-vibe">
+        <strong>${escapeHtml(normalized.vibe)}</strong>
+        <span>${escapeHtml(normalized.closing)}</span>
+      </div>
+    </section>
+  `;
+}
+
+
 function renderReceipt(data, meta = {}) {
   const normalized = normalizeData(data);
   currentData = normalized;
@@ -413,13 +486,20 @@ function renderReceipt(data, meta = {}) {
   els.receiptSong.textContent = sanitizeText(currentMeta.song, "尚未選擇歌曲");
   els.receiptArtist.textContent = sanitizeText(currentMeta.artist, "Unknown Artist");
 
-  const isSquare = els.sizeSelect && els.sizeSelect.value === "square";
-  els.receipt.classList.toggle("square-receipt", isSquare);
-  els.receiptBody.classList.toggle("square-body", isSquare);
+  const size = els.sizeSelect ? els.sizeSelect.value : "receiptOnly";
+  const isSquare = size === "square";
+  const isStory = size === "story";
 
-  els.receiptBody.innerHTML = isSquare
-    ? buildSquareReceiptHtml(normalized)
-    : buildFullReceiptHtml(normalized);
+  els.receipt.classList.toggle("square-receipt", isSquare);
+  els.receipt.classList.toggle("story-receipt", isStory);
+  els.receiptBody.classList.toggle("square-body", isSquare);
+  els.receiptBody.classList.toggle("story-body", isStory);
+
+  els.receiptBody.innerHTML = isStory
+    ? buildStoryReceiptHtml(normalized)
+    : isSquare
+      ? buildSquareReceiptHtml(normalized)
+      : buildFullReceiptHtml(normalized);
 }
 
 function applyTheme() {
@@ -1107,13 +1187,18 @@ async function downloadPng() {
       backgroundColor: els.sizeSelect.value === "receiptOnly" ? null : "#0d0d0d"
     });
 
-    const filename = `song-receipt-${Date.now()}.png`;
+    const filename = els.sizeSelect.value === "story"
+      ? `song-receipt-ig-story-${Date.now()}.png`
+      : `song-receipt-${Date.now()}.png`;
 
     // Android 與電腦版：直接下載到裝置，不走 Web Share API。
     // iOS / iPadOS 對瀏覽器下載限制較多，所以保留分享 / 長按儲存流程。
     if (!isIosDevice()) {
       await forceDownloadPng(dataUrl, filename);
-      setStatus(isMobileDevice() ? "PNG 已下載，請到手機的「下載」資料夾查看。" : "PNG 已直接下載。", "ok");
+      setStatus(els.sizeSelect.value === "story"
+        ? (isMobileDevice() ? "IG 限時動態模板已下載，請到手機「下載」資料夾，再分享到 Instagram。" : "IG 限時動態模板 PNG 已直接下載。")
+        : (isMobileDevice() ? "PNG 已下載，請到手機的「下載」資料夾查看。" : "PNG 已直接下載。"),
+        "ok");
       return;
     }
 
@@ -1121,7 +1206,7 @@ async function downloadPng() {
     const file = dataUrlToFile(dataUrl, filename);
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: "Song Receipt" });
+      await navigator.share({ files: [file], title: els.sizeSelect.value === "story" ? "Song Receipt IG Story" : "Song Receipt" });
       setStatus("已開啟分享選單。", "ok");
       return;
     }

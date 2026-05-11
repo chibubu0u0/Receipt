@@ -2593,3 +2593,302 @@ h1 {
 .capture-shell.square .receipt-foot {
   display: none;
 }
+
+
+/* IG Story template：切到 story 時，JS 會直接換成獨立 9:16 DOM，不裁切長收據 */
+.capture-shell.story {
+  width: min(430px, 100%);
+  aspect-ratio: 9 / 16;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  padding: 24px 18px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 8%, rgba(235,226,210,.24), transparent 30%),
+    radial-gradient(circle at 18% 82%, rgba(255,255,255,.07), transparent 34%),
+    linear-gradient(180deg, #11100f 0%, #191714 58%, #0d0d0d 100%);
+}
+
+.capture-shell.story .receipt-wrap {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,.36));
+}
+
+.capture-shell.story .receipt.story-receipt {
+  width: 100%;
+  height: 100%;
+  padding: 28px 24px 24px;
+  border-radius: 34px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.capture-shell.story .receipt.story-receipt::before,
+.capture-shell.story .receipt.story-receipt::after {
+  display: none !important;
+}
+
+.capture-shell.story .receipt.story-receipt .receipt-head {
+  flex: 0 0 auto;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.capture-shell.story .receipt.story-receipt .receipt-title {
+  font-size: 23px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.capture-shell.story .receipt.story-receipt .receipt-subtitle {
+  font-size: 8px;
+}
+
+.capture-shell.story .receipt.story-receipt .song-meta {
+  margin-top: 10px;
+}
+
+.capture-shell.story .receipt.story-receipt .song-name {
+  font-size: 18px;
+  line-height: 1.08;
+}
+
+.capture-shell.story .receipt.story-receipt .artist-name {
+  font-size: 10px;
+}
+
+.story-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr auto;
+  gap: 10px;
+}
+
+.story-top {
+  display: grid;
+  gap: 6px;
+}
+
+.story-kicker,
+.story-section-head {
+  color: var(--ink-2);
+  font-size: 7.5px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.story-top h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 25px;
+  line-height: 1.02;
+  letter-spacing: -.07em;
+}
+
+.story-top p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 10.5px;
+  line-height: 1.48;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.story-panel {
+  padding-top: 9px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+  display: grid;
+  gap: 7px;
+}
+
+.story-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.story-emotions {
+  display: grid;
+  gap: 5px;
+}
+
+.story-emotion-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 30px;
+  gap: 8px;
+  align-items: center;
+  color: var(--ink-2);
+  font-size: 8.5px;
+}
+
+.story-emotion-row div {
+  height: 7px;
+  border: 1px solid color-mix(in srgb, var(--ink) 24%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.story-emotion-row i {
+  display: block;
+  width: var(--w);
+  height: 100%;
+  background: var(--ink);
+  opacity: .85;
+}
+
+.story-emotion-row strong {
+  color: var(--ink);
+  font-size: 9px;
+  text-align: right;
+}
+
+.story-wave-panel svg[aria-label="旋律輪廓"] {
+  height: 58px;
+}
+
+.story-wave-panel svg[aria-label="旋律輪廓"] text {
+  display: none;
+}
+
+.story-wave-panel p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 8.5px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.story-colors {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.story-color-card {
+  display: grid;
+  gap: 4px;
+}
+
+.story-color-card span {
+  height: 18px;
+  border-radius: 999px;
+  background: var(--c);
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.story-color-card small {
+  color: var(--ink-2);
+  font-size: 7px;
+  line-height: 1.15;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.story-object-panel {
+  min-height: 0;
+}
+
+.story-objects {
+  display: grid;
+  gap: 6px;
+}
+
+.story-object {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.story-object > span {
+  color: var(--ink-2);
+  font-size: 8px;
+}
+
+.story-object strong {
+  display: block;
+  color: var(--ink);
+  font-size: 9.5px;
+  line-height: 1.1;
+}
+
+.story-object small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-2);
+  font-size: 7.5px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.story-bottom {
+  padding-top: 9px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.story-checkout {
+  display: grid;
+  gap: 4px;
+}
+
+.story-checkout-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 8px;
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink) 12%, transparent);
+  padding-bottom: 3px;
+}
+
+.story-checkout-row strong {
+  color: var(--ink);
+}
+
+.story-vibe {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.story-vibe strong {
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1;
+  letter-spacing: -.05em;
+}
+
+.story-vibe span {
+  color: var(--ink-2);
+  font-size: 8px;
+  line-height: 1.3;
+  text-align: right;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.capture-shell.story .receipt-foot {
+  display: none;
+}
