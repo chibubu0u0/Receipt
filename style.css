@@ -3373,3 +3373,261 @@ h1 {
     font-size: 8px;
   }
 }
+
+
+/* Square layout v4: higher information density while keeping true 1:1 */
+.capture-shell.square .receipt.square-receipt {
+  padding: 16px !important;
+}
+
+.sq4-card {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto auto auto auto 1fr auto;
+  gap: 5px;
+}
+
+.sq4-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--ink-2);
+  font-size: 6.3px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.sq4-hero {
+  display: grid;
+  gap: 3px;
+}
+
+.sq4-hero h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+  line-height: .98;
+  letter-spacing: -.07em;
+}
+
+.sq4-hero p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 7.8px;
+  line-height: 1.24;
+}
+
+.sq4-emotion-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.sq4-emotion {
+  border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  border-radius: 999px;
+  padding: 4px 3px;
+  text-align: center;
+  display: grid;
+  gap: 1px;
+}
+
+.sq4-emotion span {
+  color: var(--ink-2);
+  font-size: 6.2px;
+  line-height: 1;
+}
+
+.sq4-emotion strong {
+  color: var(--ink);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.sq4-mid-grid {
+  padding-top: 5px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 18%, transparent);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.sq4-block,
+.sq4-wave,
+.sq4-object-block {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.sq4-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ink-2);
+  font-size: 6.4px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.sq4-colors {
+  display: grid;
+  gap: 3px;
+}
+
+.sq4-color {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.sq4-color i {
+  display: block;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--c);
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+
+.sq4-color span {
+  color: var(--ink-2);
+  font-size: 6.5px;
+  line-height: 1.05;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sq4-items {
+  display: grid;
+  gap: 2px;
+}
+
+.sq4-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  color: var(--ink-2);
+  font-size: 6.8px;
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink) 12%, transparent);
+  padding-bottom: 2px;
+}
+
+.sq4-item strong {
+  color: var(--ink);
+}
+
+.sq4-wave {
+  padding-top: 5px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.sq4-wave svg[aria-label="旋律輪廓"] {
+  height: 34px !important;
+}
+
+.sq4-wave svg[aria-label="旋律輪廓"] text {
+  display: none !important;
+}
+
+.sq4-wave small {
+  color: var(--ink-2);
+  font-size: 6.5px;
+  line-height: 1.15;
+}
+
+.sq4-object-block {
+  min-height: 0;
+  padding-top: 5px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.sq4-objects {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3px;
+}
+
+.sq4-object {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 5px;
+  min-width: 0;
+}
+
+.sq4-object b {
+  color: var(--ink-2);
+  font-size: 6.8px;
+  font-weight: 400;
+}
+
+.sq4-object div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 5px;
+  align-items: baseline;
+}
+
+.sq4-object strong {
+  color: var(--ink);
+  font-size: 7.2px;
+  line-height: 1.05;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sq4-object span {
+  color: var(--ink-2);
+  font-size: 6.3px;
+  line-height: 1.15;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sq4-vibe {
+  padding-top: 5px;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 18%, transparent);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+.sq4-vibe strong {
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: -.05em;
+}
+
+.sq4-vibe span {
+  color: var(--ink-2);
+  font-size: 6.8px;
+  line-height: 1.2;
+  text-align: right;
+  max-width: 68%;
+}
+
+@media (max-width: 560px) {
+  .capture-shell.square .receipt.square-receipt {
+    padding: 14px !important;
+  }
+
+  .sq4-card {
+    gap: 4px;
+  }
+
+  .sq4-hero h3 {
+    font-size: 17px;
+  }
+
+  .sq4-hero p {
+    font-size: 7.4px;
+  }
+}

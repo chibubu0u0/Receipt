@@ -347,58 +347,76 @@ function buildFullReceiptHtml(normalized) {
 }
 
 function buildSquareReceiptHtml(normalized) {
-  const mainEmotion = normalized.emotions[0] || { label: "情緒", value: 80 };
-  const subEmotion = normalized.emotions[1] || { label: "餘韻", value: 70 };
-
   const emotionHtml = normalized.emotions.slice(0, 4).map(item => `
-    <div class="sq3-emotion">
+    <div class="sq4-emotion">
       <span>${escapeHtml(item.label)}</span>
       <strong>${item.value}</strong>
     </div>
   `).join("");
 
   const colorHtml = normalized.colors.slice(0, 3).map(item => `
-    <span class="sq3-color" style="--c:${item.hex}" title="${escapeHtml(item.name)}"></span>
+    <div class="sq4-color">
+      <i style="--c:${item.hex}"></i>
+      <span>${escapeHtml(compactReceiptText(item.name, 12))}</span>
+    </div>
   `).join("");
 
-  const object = normalized.objects[0] || { name: "記憶物件", meaning: "情緒的具現化" };
-  const item = normalized.items[0] || { name: "心情項目", intensity: mainEmotion.value || 80 };
+  const objectHtml = normalized.objects.slice(0, 3).map((item, i) => `
+    <div class="sq4-object">
+      <b>0${i + 1}</b>
+      <div>
+        <strong>${escapeHtml(compactReceiptText(item.name, 11))}</strong>
+        <span>${escapeHtml(compactReceiptText(item.meaning, 26))}</span>
+      </div>
+    </div>
+  `).join("");
+
+  const itemHtml = normalized.items.slice(0, 4).map(item => `
+    <div class="sq4-item">
+      <span>${escapeHtml(compactReceiptText(item.name, 10))}</span>
+      <strong>${item.intensity}%</strong>
+    </div>
+  `).join("");
 
   return `
-    <section class="sq3-card">
-      <div class="sq3-topline">
+    <section class="sq4-card">
+      <div class="sq4-topline">
         <span>AI EMOTIONAL CHECKOUT</span>
         <span>SONG RECEIPT</span>
       </div>
 
-      <div class="sq3-hero">
-        <h3>${escapeHtml(compactReceiptText(normalized.tagline, 16))}</h3>
-        <p>${escapeHtml(compactReceiptText(normalized.soul, 46))}</p>
+      <div class="sq4-hero">
+        <h3>${escapeHtml(compactReceiptText(normalized.tagline, 18))}</h3>
+        <p>${escapeHtml(compactReceiptText(normalized.soul, 82))}</p>
       </div>
 
-      <div class="sq3-emotion-grid">${emotionHtml}</div>
+      <div class="sq4-emotion-grid">${emotionHtml}</div>
 
-      <div class="sq3-color-wave">
-        <div class="sq3-colors">${colorHtml}</div>
+      <div class="sq4-mid-grid">
+        <div class="sq4-block">
+          <div class="sq4-head"><span>色彩語言</span><span>01</span></div>
+          <div class="sq4-colors">${colorHtml}</div>
+        </div>
+        <div class="sq4-block">
+          <div class="sq4-head"><span>心情結帳</span><span>02</span></div>
+          <div class="sq4-items">${itemHtml}</div>
+        </div>
+      </div>
+
+      <div class="sq4-wave">
+        <div class="sq4-head"><span>情緒輪廓</span><span>03</span></div>
         ${makeMelodySvg(normalized.melody, normalized.colors)}
+        <small>${escapeHtml(compactReceiptText(normalized.melody.label, 34))}</small>
       </div>
 
-      <div class="sq3-bottom">
-        <div class="sq3-mini">
-          <small>具現化</small>
-          <strong>${escapeHtml(compactReceiptText(object.name, 12))}</strong>
-          <span>${escapeHtml(compactReceiptText(object.meaning, 20))}</span>
-        </div>
-        <div class="sq3-mini">
-          <small>結帳摘要</small>
-          <strong>${escapeHtml(compactReceiptText(item.name, 12))}</strong>
-          <span>${item.intensity}% · ${escapeHtml(subEmotion.label)}</span>
-        </div>
+      <div class="sq4-object-block">
+        <div class="sq4-head"><span>歌曲具現化</span><span>04</span></div>
+        <div class="sq4-objects">${objectHtml}</div>
       </div>
 
-      <div class="sq3-vibe">
-        <strong>${escapeHtml(compactReceiptText(normalized.vibe, 10))}</strong>
-        <span>${escapeHtml(compactReceiptText(normalized.closing, 28))}</span>
+      <div class="sq4-vibe">
+        <strong>${escapeHtml(compactReceiptText(normalized.vibe, 12))}</strong>
+        <span>${escapeHtml(compactReceiptText(normalized.closing, 44))}</span>
       </div>
     </section>
   `;
