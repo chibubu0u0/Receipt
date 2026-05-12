@@ -3827,3 +3827,36 @@ body.exporting-png .receipt.night {
 body.exporting-png .receipt-wrap {
   padding: 16px 0 20px !important;
 }
+
+
+/* White backing under the generated receipt */
+.capture-shell.receiptOnly {
+  background: #ffffff !important;
+  padding: 26px 18px 34px !important;
+  border-radius: 24px !important;
+}
+
+.capture-shell.receiptOnly .receipt-wrap {
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+.capture-shell.receiptOnly .receipt {
+  box-shadow: none !important;
+}
+
+/* Export should include the white backing, but no dark preview background or shadow */
+body.exporting-png .capture-shell.receiptOnly,
+body.exporting-png .capture-shell {
+  background: #ffffff !important;
+  padding: 26px 18px 34px !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+body.exporting-png .receipt-wrap,
+body.exporting-png .receipt {
+  box-shadow: none !important;
+  filter: none !important;
+}

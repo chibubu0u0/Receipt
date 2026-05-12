@@ -458,7 +458,7 @@ function buildInstructions(depth, note) {
 - soul：2 到 3 句，每句都要有具體場景、動作或感官細節。標準分析要清楚；深層進化要更細膩；導演版要更像鏡頭描述。
 - tagline：12 字以內，像唱片行牆上的一句標語。
 - emotions：4 個，name 要具體有畫面，label 2-4 字，value 0-100。
-- colors：3 個，hex 合法，name 不要只說顏色，要像詩意色名。導演版要包含更明確的光線、材質或色溫感。
+- colors：3 個，hex 合法，必須根據「這首歌」的情緒、曲名意象、歌手風格與聽感重新選色。不要反覆使用固定色票或示範色，例如 #8BA89C、#D7BFA6、#4B4A44。name 不要只說顏色，要像詩意色名，且要貼合歌曲畫面。三個顏色請分別代表：主情緒色、記憶/場景色、陰影/餘韻色。
 - melody.contour：20 個左右 0-100 的數字，反映歌曲情感動態，不要全部平。
 - melody.sections：5-7 個繁體中文段落名。
 - objects：3 個「歌曲具現化」的元素，像 MV 道具、記憶物件、場景符號，搭配它代表的情緒意義。
@@ -479,6 +479,102 @@ function getOutputText(result) {
 
   return "";
 }
+
+
+function isValidHexColor(value) {
+  return typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value.trim());
+}
+
+function hashText(value) {
+  const text = String(value || "");
+  let hash = 2166136261;
+
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return Math.abs(hash >>> 0);
+}
+
+function hslToHex(h, s, l) {
+  const hue = ((h % 360) + 360) % 360;
+  const sat = Math.max(0, Math.min(100, s)) / 100;
+  const light = Math.max(0, Math.min(100, l)) / 100;
+  const c = (1 - Math.abs(2 * light - 1)) * sat;
+  const x = c * (1 - Math.abs((hue / 60) % 2 - 1));
+  const m = light - c / 2;
+  let r = 0;
+  let g = 0;
+  let b = 0;
+
+  if (hue < 60) [r, g, b] = [c, x, 0];
+  else if (hue < 120) [r, g, b] = [x, c, 0];
+  else if (hue < 180) [r, g, b] = [0, c, x];
+  else if (hue < 240) [r, g, b] = [0, x, c];
+  else if (hue < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+
+  const toHex = channel => Math.round((channel + m) * 255)
+    .toString(16)
+    .padStart(2, "0");
+
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+}
+
+function makeSongSpecificPalette(artist, song, vibe = "") {
+  const seed = hashText(`${artist}::${song}::${vibe}`);
+  const baseHue = seed % 360;
+  const shiftA = 35 + (seed % 22);
+  const shiftB = 150 + (seed % 50);
+
+  const descriptors = [
+    "主情緒光",
+    "場景殘影",
+    "餘韻陰影"
+  ];
+
+  return [
+    {
+      hex: hslToHex(baseHue, 42 + (seed % 18), 44 + (seed % 10)),
+      name: `${song.slice(0, 6) || "歌曲"}的${descriptors[0]}`
+    },
+    {
+      hex: hslToHex(baseHue + shiftA, 36 + (seed % 16), 66 + (seed % 8)),
+      name: `${artist.slice(0, 6) || "歌手"}聲線旁的${descriptors[1]}`
+    },
+    {
+      hex: hslToHex(baseHue + shiftB, 30 + (seed % 18), 28 + (seed % 10)),
+      name: `副歌退場後的${descriptors[2]}`
+    }
+  ];
+}
+
+function ensureSongSpecificColors(data, artist, song) {
+  const demoHexes = new Set(["#8BA89C", "#D7BFA6", "#4B4A44"]);
+  const colors = Array.isArray(data.colors) ? data.colors : [];
+  const validColors = colors
+    .slice(0, 3)
+    .filter(item => item && isValidHexColor(item.hex));
+
+  const normalizedHexes = validColors.map(item => item.hex.trim().toUpperCase());
+  const allDemoColors = normalizedHexes.length === 3 && normalizedHexes.every(hex => demoHexes.has(hex));
+  const notEnoughColors = validColors.length < 3;
+  const duplicateColors = new Set(normalizedHexes).size < normalizedHexes.length;
+
+  if (notEnoughColors || allDemoColors || duplicateColors) {
+    data.colors = makeSongSpecificPalette(artist, song, data.vibe || data.tagline || "");
+    return data;
+  }
+
+  data.colors = colors.slice(0, 3).map((item, index) => ({
+    hex: String(item.hex || validColors[index]?.hex || "#8BA89C").trim().toUpperCase(),
+    name: String(item.name || ["主情緒色", "場景色", "餘韻色"][index]).slice(0, 48)
+  }));
+
+  return data;
+}
+
 
 export default async function handler(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -593,6 +689,8 @@ export default async function handler(req, res) {
     } catch {
       return res.status(502).json({ error: "OpenAI 回傳的 JSON 無法解析。" });
     }
+
+    data = ensureSongSpecificColors(data, verifiedArtist, verifiedSong);
 
     const remainingCredits = Math.max(0, currentCredits - 1);
     await updateCredits(user.id, remainingCredits);
