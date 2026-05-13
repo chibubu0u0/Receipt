@@ -20,10 +20,20 @@ const iconEnum = [
 const songReceiptSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["soul", "tagline", "emotions", "colors", "melody", "objects", "items", "closing", "vibe"],
+  required: ["soul", "tagline", "lyricEssence", "emotions", "colors", "melody", "objects", "items", "closing", "vibe"],
   properties: {
     soul: { type: "string" },
     tagline: { type: "string" },
+    lyricEssence: {
+      type: "object",
+      additionalProperties: false,
+      required: ["title", "summary", "quote"],
+      properties: {
+        title: { type: "string" },
+        summary: { type: "string" },
+        quote: { type: "string" }
+      }
+    },
     emotions: {
       type: "array",
       items: {
@@ -503,6 +513,7 @@ function buildInstructions(depth, note) {
 
 重要限制：
 - 不要引用或改寫任何完整歌詞。可以描述情緒、聲音、氛圍與可推測的畫面。
+- lyricEssence 可以呈現「最經典歌詞意象」，但 quote 欄位最多只能放 10 個字以內的極短片段；如果不確定或容易超過限制，quote 請填空字串。summary 必須用自己的話概括，不要複製歌詞。
 - 如果你不確定冷門歌曲的完整資料，根據歌手風格、曲名語意與可推測的音樂情緒生成，但不要假裝知道不存在的細節。
 - 只回傳 JSON，不要 markdown，不要解釋。
 - 不要輸出你的思考過程、自我檢查過程或草稿。
@@ -518,6 +529,7 @@ function buildInstructions(depth, note) {
 用戶補充語氣：${note || "無"}
 
 欄位寫作規則：
+- lyricEssence：呈現「經典歌詞意象」。title 是 8 字以內小標；summary 是 1-2 句，用自己的話概括歌詞最被記住的情緒或畫面，不要照抄歌詞；quote 最多 10 個字以內，也可以是空字串。
 - soul：2 到 3 句，每句都要有具體場景、動作或感官細節。標準分析要清楚；深層進化要更細膩；導演版要更像鏡頭描述。
 - tagline：12 字以內，像唱片行牆上的一句標語。
 - emotions：4 個，name 要具體有畫面，label 2-4 字，value 0-100。
@@ -531,6 +543,7 @@ function buildInstructions(depth, note) {
 
 最終輸出前請再次內部確認：
 - 情緒名稱不要互相矛盾。
+- lyricEssence 必須是對歌詞意象的重新整理，不要變成逐字歌詞引用。
 - 色彩語言必須和歌曲氛圍有關，不要只是好看的顏色。
 - 歌曲具現化物件要像真的能出現在畫面裡。
 - 心情結帳項目的強度要和 emotions 的數值有呼應。

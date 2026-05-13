@@ -166,6 +166,11 @@ function normalizeData(data) {
   return {
     soul: sanitizeText(safe.soul, demoData.soul),
     tagline: sanitizeText(safe.tagline, demoData.tagline).slice(0, 18),
+    lyricEssence: {
+      title: sanitizeText(safe.lyricEssence?.title, demoData.lyricEssence?.title || "歌詞印象").slice(0, 8),
+      summary: sanitizeText(safe.lyricEssence?.summary, demoData.lyricEssence?.summary || "這首歌被記住的不是某一句話，而是那種反覆回來的情緒。"),
+      quote: sanitizeText(safe.lyricEssence?.quote, "").slice(0, 10)
+    },
     emotions: (Array.isArray(safe.emotions) && safe.emotions.length ? safe.emotions : demoData.emotions).slice(0, 4).map(item => ({
       icon: iconSvg[item.icon] ? item.icon : "circle",
       name: sanitizeText(item.name, "說不出口的情緒"),
@@ -311,29 +316,38 @@ function buildFullReceiptHtml(normalized) {
       <p class="tagline">${escapeHtml(normalized.tagline)}</p>
     </section>
 
+    <section class="section lyric-essence-section">
+      <div class="section-label"><span>經典歌詞意象</span><span>02</span></div>
+      <div class="lyric-essence-card">
+        <div class="lyric-essence-title">${escapeHtml(normalized.lyricEssence.title)}</div>
+        ${normalized.lyricEssence.quote ? `<div class="lyric-essence-quote">「${escapeHtml(normalized.lyricEssence.quote)}」</div>` : ""}
+        <p>${escapeHtml(normalized.lyricEssence.summary)}</p>
+      </div>
+    </section>
+
     <section class="section">
-      <div class="section-label"><span>情緒標籤</span><span>02</span></div>
+      <div class="section-label"><span>情緒標籤</span><span>03</span></div>
       <div class="emotion-list">${emotionHtml}</div>
     </section>
 
     <section class="section">
-      <div class="section-label"><span>色彩語言</span><span>03</span></div>
+      <div class="section-label"><span>色彩語言</span><span>04</span></div>
       <div class="palette">${colorHtml}</div>
     </section>
 
     <section class="section">
-      <div class="section-label"><span>情緒輪廓</span><span>04</span></div>
+      <div class="section-label"><span>情緒輪廓</span><span>05</span></div>
       ${makeMelodySvg(normalized.melody, normalized.colors)}
       <p class="melody-label">${escapeHtml(normalized.melody.label)}</p>
     </section>
 
     <section class="section">
-      <div class="section-label"><span>歌曲具現化</span><span>05</span></div>
+      <div class="section-label"><span>歌曲具現化</span><span>06</span></div>
       <div class="object-list">${objectHtml}</div>
     </section>
 
     <section class="section">
-      <div class="section-label"><span>心情結帳</span><span>06</span></div>
+      <div class="section-label"><span>心情結帳</span><span>07</span></div>
       <table class="items-table">
         <thead><tr><th>項目</th><th>數量</th><th>強度</th></tr></thead>
         <tbody>${itemHtml}</tbody>

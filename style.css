@@ -4087,3 +4087,35 @@ body.exporting-png .receipt {
     justify-self: start;
   }
 }
+
+
+/* Classic lyric essence block */
+.lyric-essence-card {
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  border-radius: 14px;
+  padding: 12px 13px;
+  background: color-mix(in srgb, var(--paper) 92%, #ffffff);
+}
+
+.lyric-essence-title {
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.35;
+  margin-bottom: 6px;
+  font-weight: 400;
+}
+
+.lyric-essence-quote {
+  color: #756d63;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 5px;
+  letter-spacing: .04em;
+}
+
+.lyric-essence-card p {
+  margin: 0;
+  color: #5f574e;
+  font-size: 12px;
+  line-height: 1.65;
+}

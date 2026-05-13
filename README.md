@@ -840,3 +840,21 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 未選版本時會回傳 `409 + song_versions_found + versions`
 - 已選版本時會使用該版本的 artist / song / album 生成
 - iTunes / MusicBrainz 的候選結果現在會保留 album/source，避免不同版本被合併掉
+
+
+## 經典歌詞意象版
+
+這版新增「經典歌詞意象」區塊：
+
+- AI 會整理這首歌最被記住的歌詞情緒或畫面
+- 不會輸出完整歌詞
+- `quote` 欄位最多只允許 10 個字以內的極短片段，也可以留空
+- `summary` 會用自己的話描述歌詞意象，避免直接複製歌詞
+- 收據章節順序已更新為：
+  1. 靈魂解讀
+  2. 經典歌詞意象
+  3. 情緒標籤
+  4. 色彩語言
+  5. 情緒輪廓
+  6. 歌曲具現化
+  7. 心情結帳
