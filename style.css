@@ -3921,3 +3921,33 @@ body.exporting-png .receipt {
 .total-label {
   letter-spacing: .14em;
 }
+
+
+/* Chinese text color: softer / lighter ink */
+.receipt:not(.night) .receipt-title,
+.receipt:not(.night) .tagline,
+.receipt:not(.night) .total-vibe,
+.receipt:not(.night) .soul,
+.receipt:not(.night) .emotion-name,
+.receipt:not(.night) .color-name,
+.receipt:not(.night) .object-item,
+.receipt:not(.night) .items-table td:first-child,
+.receipt:not(.night) .closing,
+.receipt:not(.night) .melody-label {
+  color: #4f4942;
+}
+
+.receipt:not(.night) .section-label,
+.receipt:not(.night) .total-label,
+.receipt:not(.night) .items-table th {
+  color: #8a8176;
+}
+
+/* Keep bars / numbers readable but softer */
+.receipt:not(.night) .bar-line,
+.receipt:not(.night) .color-row,
+.receipt:not(.night) .object-index,
+.receipt:not(.night) .items-table td:nth-child(2),
+.receipt:not(.night) .items-table td:nth-child(3) {
+  color: #7a7168;
+}
