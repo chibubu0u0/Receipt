@@ -165,17 +165,6 @@
             </div>
           </div>
         </div>
-        <div class="mode-preview-wrap single-analysis-wrap">
-          <div class="control-label">分析風格</div>
-          <div class="single-analysis-card">
-            <div>
-              <strong>情緒收據分析</strong>
-              <p>目前統一使用最穩定的分析模式：清楚好讀、保留畫面感，也避免模式差異不夠明顯造成混淆。</p>
-            </div>
-            <span>AI EMOTIONAL CHECKOUT</span>
-          </div>
-        </div>
-
         <div class="form-grid">
 <div class="row">
             <div class="field">
@@ -202,16 +191,9 @@
                 <option value="night">深夜黑票</option>
               </select>
             </div>
-            <div class="field output-format-note">
-              <label>輸出格式</label>
-              <div class="single-format-card">
-                <strong>收據紙</strong>
-                <span>目前只保留完整長條收據格式，避免方形與限動排版被裁切或跑版。</span>
-              </div>
-              <select id="sizeSelect" hidden aria-hidden="true">
-                <option value="receiptOnly" selected>只輸出收據</option>
-              </select>
-            </div>
+            <select id="sizeSelect" hidden aria-hidden="true">
+              <option value="receiptOnly" selected>只輸出收據</option>
+            </select>
           </div>
         </div>
 
@@ -219,10 +201,6 @@
           <button class="btn btn-primary" id="generateBtn">產生收據</button>
           <button class="btn btn-secondary" id="demoBtn">載入範例</button>
           <button class="btn btn-secondary" id="downloadBtn">下載／分享 PNG</button>
-        </div>
-
-        <div class="hint">
-          小提示：不用註冊帳號也可以直接生成；目前只保留完整收據紙格式，下載時會墊白底並移除黑邊。
         </div>
         <div id="status" class="status"></div>
 
@@ -260,6 +238,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=no-login-1"></script>
+  <script src="./app.js?v=no-login-clean-ui-1"></script>
 </body>
 </html>

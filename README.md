@@ -737,3 +737,14 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 目前後端只需要 `OPENAI_API_KEY` 即可生成
 
 注意：免登入代表任何打開網站的人都可以使用你的 OpenAI API 生成，之後若流量變大，建議再加上 IP rate limit、Turnstile 驗證或每日免費次數限制。
+
+
+## 介面說明精簡版
+
+這版依需求移除：
+
+- 「分析風格」說明區塊
+- 「輸出格式」說明區塊
+- 對應的小提示文字
+
+保留隱藏的 `sizeSelect`，避免現有程式碼找不到元素。
