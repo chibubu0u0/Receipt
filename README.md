@@ -722,3 +722,18 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
   - 強化 OpenAI prompt，要求每首歌依歌曲情緒、曲名意象、歌手風格重新選色
   - 明確禁止反覆使用示範色票 `#8BA89C / #D7BFA6 / #4B4A44`
   - 後端新增保護機制：若 AI 回傳色票不足、重複或等於示範色，會依歌手 + 歌名自動產生一組專屬色票
+
+
+## 免登入生成版
+
+這版依需求調整：
+
+- 移除前台登入 / 註冊 / 會員生成次數區塊
+- 使用者不需要註冊帳號即可直接輸入歌手與歌名生成收據
+- `/api/generate` 不再要求 Supabase 登入 token
+- `/api/generate` 不再檢查或扣除 user_credits
+- 查無歌曲仍會回傳 `song_not_found`，不會進入 AI 生成
+- 生成紀錄僅保留瀏覽器本機「最近生成」，不再寫入 Supabase receipts
+- 目前後端只需要 `OPENAI_API_KEY` 即可生成
+
+注意：免登入代表任何打開網站的人都可以使用你的 OpenAI API 生成，之後若流量變大，建議再加上 IP rate limit、Turnstile 驗證或每日免費次數限制。

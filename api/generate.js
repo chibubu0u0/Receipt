@@ -589,15 +589,7 @@ export default async function handler(req, res) {
     });
   }
 
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return res.status(500).json({
-      error: "尚未設定 SUPABASE_URL 或 SUPABASE_SERVICE_ROLE_KEY。"
-    });
-  }
-
   try {
-    const user = await getUserFromToken(req);
-
     const body = req.body || {};
     const artist = String(body.artist || "").trim();
     const song = String(body.song || "").trim();
@@ -611,22 +603,10 @@ export default async function handler(req, res) {
     const validation = await validateSongExists(artist, song);
 
     if (!validation.found) {
-      const currentCredits = await getOrCreateCredits(user.id);
-
       return res.status(404).json({
         code: "song_not_found",
         error: makeSongNotFoundMessage(artist, song, validation.suggestions),
-        suggestions: validation.suggestions,
-        remainingCredits: currentCredits
-      });
-    }
-
-    const currentCredits = await getOrCreateCredits(user.id);
-
-    if (currentCredits <= 0) {
-      return res.status(402).json({
-        error: "你的生成次數已用完。若需要更多次數，請私訊 Instagram 或寄信聯絡。",
-        remainingCredits: 0
+        suggestions: validation.suggestions
       });
     }
 
@@ -692,33 +672,9 @@ export default async function handler(req, res) {
 
     data = ensureSongSpecificColors(data, verifiedArtist, verifiedSong);
 
-    const remainingCredits = Math.max(0, currentCredits - 1);
-    await updateCredits(user.id, remainingCredits);
-
-    await supabaseRequest("/rest/v1/credit_logs", {
-      method: "POST",
-      body: JSON.stringify({
-        user_id: user.id,
-        type: "generation",
-        amount: -1,
-        reason: `${verifiedArtist} - ${verifiedSong}`
-      })
-    });
-
-    await supabaseRequest("/rest/v1/receipts", {
-      method: "POST",
-      body: JSON.stringify({
-        user_id: user.id,
-        artist: verifiedArtist,
-        song: verifiedSong,
-        result_json: data
-      })
-    });
-
     return res.status(200).json({
       data,
-      verifiedSong: { artist: verifiedArtist, song: verifiedSong },
-      remainingCredits
+      verifiedSong: { artist: verifiedArtist, song: verifiedSong }
     });
   } catch (error) {
     console.error(error);

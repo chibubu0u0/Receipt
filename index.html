@@ -36,7 +36,7 @@
           進化版會把歌曲拆成情緒、歌曲具現化、色彩、旋律曲線與「心情結帳」。不是只分析歌曲，而是把一首歌做成一張可以分享的情感商品小票。
         </p>
 
-        <div class="account-card" id="accountCard">
+        <div class="account-card no-login-hidden" id="accountCard" hidden aria-hidden="true">
           <div class="account-head">
             <div>
               <div class="account-title">會員與生成次數</div>
@@ -216,13 +216,13 @@
         </div>
 
         <div class="actions">
-          <button class="btn btn-primary" id="generateBtn">產生進化版收據</button>
+          <button class="btn btn-primary" id="generateBtn">產生收據</button>
           <button class="btn btn-secondary" id="demoBtn">載入範例</button>
           <button class="btn btn-secondary" id="downloadBtn">下載／分享 PNG</button>
         </div>
 
         <div class="hint">
-          小提示：目前只保留完整收據紙格式；收據下方會墊白底，下載時移除黑邊、陰影與黑底。
+          小提示：不用註冊帳號也可以直接生成；目前只保留完整收據紙格式，下載時會墊白底並移除黑邊。
         </div>
         <div id="status" class="status"></div>
 
@@ -260,6 +260,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=white-bg-color-fix-1"></script>
+  <script src="./app.js?v=no-login-1"></script>
 </body>
 </html>

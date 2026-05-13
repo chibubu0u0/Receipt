@@ -1061,30 +1061,19 @@ async function generateReceipt() {
   const note = els.listenerNote.value.trim();
   const nl = String.fromCharCode(10);
 
-  if (!currentSession) {
-    setStatus("請先登入，才能使用生成次數。", "error");
-    return;
-  }
-
   if (!artist || !song) {
     setStatus("請輸入歌手與歌名。", "error");
     return;
   }
 
-  if (currentCredits !== null && currentCredits <= 0) {
-    setStatus("你的生成次數已用完。下一步可以接付款系統來購買次數。", "error");
-    return;
-  }
-
-  setStatus("先確認歌曲是否存在；確認後才會扣點並開始分析…");
+  setStatus("先確認歌曲是否存在；確認後開始生成收據…");
   els.generateBtn.disabled = true;
 
   try {
     const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${currentSession.access_token}`
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         artist,
@@ -1100,10 +1089,6 @@ async function generateReceipt() {
       const message = result && result.error ? result.error : `後端 API 回應失敗：${response.status}`;
 
       if (result && result.code === "song_not_found") {
-        if (typeof result.remainingCredits === "number") {
-          setAuthState(currentSession, result.remainingCredits);
-        }
-
         setStatus(message, "error");
         return;
       }
@@ -1123,14 +1108,7 @@ async function generateReceipt() {
     renderReceipt(normalized, { artist: displayArtist, song: displaySong });
     saveHistory({ artist: displayArtist, song: displaySong, data: normalized, createdAt: new Date().toISOString() });
 
-    if (typeof result.remainingCredits === "number") {
-      currentIsAdmin = Boolean(result.isAdmin);
-    setAuthState(currentSession, result.remainingCredits);
-    await refreshCloudReceipts();
-    }
-
-    await refreshCloudReceipts();
-    setStatus("完成。已扣除 1 次生成次數。", "ok");
+    setStatus("完成。收據已生成。", "ok");
   } catch (error) {
     console.error(error);
     setStatus(`${error.message || "產生失敗，請確認後端 API 或網路狀態。"}${nl}如果剛設定完 Vercel 環境變數，請重新部署一次。`, "error");
@@ -1248,7 +1226,7 @@ function loadDemo() {
   els.song.value = "cardigan";
   els.listenerNote.value = "偏文青、像獨立唱片行的情緒小票";
   renderReceipt(demoData, { artist: els.artist.value, song: els.song.value });
-  setStatus("已載入範例。可以切換風格與尺寸測試。", "ok");
+  setStatus("已載入範例。可以直接生成或下載收據。", "ok");
 }
 
 function resetApp() {

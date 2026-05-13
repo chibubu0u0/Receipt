@@ -3860,3 +3860,10 @@ body.exporting-png .receipt {
   box-shadow: none !important;
   filter: none !important;
 }
+
+
+/* No-login version */
+.no-login-hidden,
+#accountCard {
+  display: none !important;
+}
