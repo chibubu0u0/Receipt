@@ -821,3 +821,22 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 章節標題也略微加粗
 - 中文內文仍維持 ExtraLight 200 的輕盈感
 - 標題顏色稍微加深，讓層次更清楚
+
+
+## 歌曲版本選擇版
+
+這版新增：
+
+- 生成前會先查詢歌曲版本
+- 如果同一首歌找到多個可能版本，前台會顯示「選擇歌曲版本」
+- 使用者可以選單曲版、專輯版、Live、Remaster 或不同資料來源版本
+- 選定版本後才會進入 AI 生成
+- 若只找到一個明確版本，會直接生成，不增加多餘步驟
+- 查無歌曲仍會回傳查無此歌曲，不進入 AI 生成
+
+後端調整：
+
+- `/api/generate` 支援 `selectedVersion`
+- 未選版本時會回傳 `409 + song_versions_found + versions`
+- 已選版本時會使用該版本的 artist / song / album 生成
+- iTunes / MusicBrainz 的候選結果現在會保留 album/source，避免不同版本被合併掉

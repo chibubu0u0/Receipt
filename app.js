@@ -46,7 +46,10 @@ const els = {
   captureArea: document.getElementById("captureArea"),
   savePanel: document.getElementById("savePanel"),
   saveImage: document.getElementById("saveImage"),
-  savePanelText: document.getElementById("savePanelText")
+  savePanelText: document.getElementById("savePanelText"),
+  songVersionPanel: document.getElementById("songVersionPanel"),
+  songVersionList: document.getElementById("songVersionList"),
+  versionCancelBtn: document.getElementById("versionCancelBtn")
 };
 
 const iconSvg = {
@@ -1055,9 +1058,65 @@ async function signOut() {
 }
 
 
-async function generateReceipt() {
-  const artist = els.artist.value.trim();
-  const song = els.song.value.trim();
+
+function hideSongVersionPanel() {
+  if (!els.songVersionPanel) return;
+
+  els.songVersionPanel.hidden = true;
+  els.songVersionList.innerHTML = "";
+}
+
+function formatVersionMeta(version) {
+  const parts = [];
+
+  if (version.album) parts.push(version.album);
+  if (version.source) parts.push(version.source);
+
+  return parts.length ? parts.join("｜") : "歌曲版本";
+}
+
+function showSongVersionPanel(versions, originalInput) {
+  if (!els.songVersionPanel || !els.songVersionList) return;
+
+  const safeVersions = Array.isArray(versions) ? versions.slice(0, 8) : [];
+
+  if (!safeVersions.length) {
+    hideSongVersionPanel();
+    return;
+  }
+
+  els.songVersionList.innerHTML = safeVersions.map((version, index) => `
+    <button class="song-version-card" type="button" data-index="${index}">
+      <span class="song-version-number">${String(index + 1).padStart(2, "0")}</span>
+      <span class="song-version-main">
+        <strong>${escapeHtml(version.song || originalInput.song || "Unknown Song")}</strong>
+        <small>${escapeHtml(version.artist || originalInput.artist || "Unknown Artist")}</small>
+        <em>${escapeHtml(formatVersionMeta(version))}</em>
+      </span>
+      <span class="song-version-action">選擇</span>
+    </button>
+  `).join("");
+
+  els.songVersionList.querySelectorAll(".song-version-card").forEach(button => {
+    button.addEventListener("click", () => {
+      const version = safeVersions[Number(button.dataset.index)];
+
+      if (!version) return;
+
+      hideSongVersionPanel();
+      setStatus(`已選擇版本：${version.artist} - ${version.song}。正在生成收據…`, "ok");
+      generateReceipt(version);
+    });
+  });
+
+  els.songVersionPanel.hidden = false;
+  els.songVersionPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+
+async function generateReceipt(selectedVersion = null) {
+  const artist = selectedVersion && selectedVersion.artist ? selectedVersion.artist : els.artist.value.trim();
+  const song = selectedVersion && selectedVersion.song ? selectedVersion.song : els.song.value.trim();
   const note = els.listenerNote.value.trim();
   const nl = String.fromCharCode(10);
 
@@ -1066,7 +1125,11 @@ async function generateReceipt() {
     return;
   }
 
-  setStatus("先確認歌曲是否存在；確認後開始生成收據…");
+  if (!selectedVersion) {
+    hideSongVersionPanel();
+  }
+
+  setStatus(selectedVersion ? "正在依照你選擇的版本生成收據…" : "先查詢歌曲版本；確認後開始生成收據…");
   els.generateBtn.disabled = true;
 
   try {
@@ -1079,7 +1142,8 @@ async function generateReceipt() {
         artist,
         song,
         note,
-        depth: currentDepth
+        depth: currentDepth,
+        selectedVersion
       })
     });
 
@@ -1087,6 +1151,12 @@ async function generateReceipt() {
 
     if (!response.ok) {
       const message = result && result.error ? result.error : `後端 API 回應失敗：${response.status}`;
+
+      if (result && result.code === "song_versions_found") {
+        showSongVersionPanel(result.versions, { artist, song });
+        setStatus("找到多個可能版本，請先選擇你要生成的歌曲版本。", "ok");
+        return;
+      }
 
       if (result && result.code === "song_not_found") {
         setStatus(message, "error");
@@ -1233,6 +1303,7 @@ function resetApp() {
   els.artist.value = "";
   els.song.value = "";
   els.listenerNote.value = "";
+  hideSongVersionPanel();
   els.savePanel.classList.remove("show");
   renderReceipt(demoData, { artist: "Demo Artist", song: "Demo Song" });
 applySize({ skipRender: true });
@@ -1254,6 +1325,10 @@ els.generateBtn.addEventListener("click", generateReceipt);
 els.demoBtn.addEventListener("click", loadDemo);
 els.downloadBtn.addEventListener("click", downloadPng);
 els.resetBtn.addEventListener("click", resetApp);
+els.versionCancelBtn.addEventListener("click", () => {
+  hideSongVersionPanel();
+  setStatus("已取消版本選擇，可以重新輸入歌曲。", "ok");
+});
 els.signInBtn.addEventListener("click", signIn);
 els.signUpBtn.addEventListener("click", signUp);
 els.signOutBtn.addEventListener("click", signOut);

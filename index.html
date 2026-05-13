@@ -200,6 +200,18 @@
           </div>
         </div>
 
+
+        <div class="song-version-panel" id="songVersionPanel" hidden>
+          <div class="song-version-head">
+            <div>
+              <div class="song-version-title">選擇歌曲版本</div>
+              <div class="song-version-subtitle">同一首歌可能有單曲版、專輯版、Live、Remaster 或不同地區版本。請選擇你想生成的版本。</div>
+            </div>
+            <button class="btn btn-ghost mini-btn" id="versionCancelBtn" type="button">重新輸入</button>
+          </div>
+          <div class="song-version-list" id="songVersionList"></div>
+        </div>
+
         <div class="actions">
           <button class="btn btn-primary" id="generateBtn">產生收據</button>
           <button class="btn btn-secondary" id="demoBtn">載入範例</button>
@@ -241,6 +253,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=zh-title-weight-1"></script>
+  <script src="./app.js?v=song-version-select-1"></script>
 </body>
 </html>

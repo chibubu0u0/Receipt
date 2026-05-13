@@ -302,7 +302,7 @@ function uniqueCandidates(candidates) {
   const results = [];
 
   for (const item of candidates) {
-    const key = `${compactForCompare(item.artist)}::${compactForCompare(item.song)}`;
+    const key = `${compactForCompare(item.artist)}::${compactForCompare(item.song)}::${compactForCompare(item.album)}::${item.source || ""}`;
     if (!key || seen.has(key)) continue;
     seen.add(key);
     results.push(item);
@@ -310,6 +310,61 @@ function uniqueCandidates(candidates) {
 
   return results;
 }
+
+
+function toPublicVersion(item) {
+  return {
+    artist: item.artist || "",
+    song: item.song || "",
+    album: item.album || "",
+    source: item.source || "",
+    titleScore: Number.isFinite(item.titleScore) ? Math.round(item.titleScore * 100) / 100 : undefined,
+    artistScore: Number.isFinite(item.artistScore) ? Math.round(item.artistScore * 100) / 100 : undefined
+  };
+}
+
+function getLikelyVersions(candidates) {
+  const accepted = candidates
+    .filter(item =>
+      isAcceptedSongMatch(item) ||
+      (item.titleScore >= 0.72 && item.artistScore >= 0.38) ||
+      (item.titleScore >= 0.86 && item.artistScore >= 0.25)
+    )
+    .slice(0, 8)
+    .map(toPublicVersion);
+
+  // 如果資料來源只給一筆，但這筆很確定，就保留一筆，讓後端可直接生成。
+  return accepted;
+}
+
+function hasMeaningfulVersionChoices(versions) {
+  if (!Array.isArray(versions) || versions.length < 2) return false;
+
+  const signatures = new Set(
+    versions.map(item => `${compactForCompare(item.artist)}::${compactForCompare(item.song)}::${compactForCompare(item.album)}`)
+  );
+
+  return signatures.size >= 2;
+}
+
+function sanitizeSelectedVersion(value) {
+  if (!value || typeof value !== "object") return null;
+
+  const artist = String(value.artist || "").trim();
+  const song = String(value.song || "").trim();
+  const album = String(value.album || "").trim();
+  const source = String(value.source || "").trim();
+
+  if (!artist || !song) return null;
+
+  return {
+    artist: artist.slice(0, 120),
+    song: song.slice(0, 160),
+    album: album.slice(0, 180),
+    source: source.slice(0, 60)
+  };
+}
+
 
 async function searchITunesSong(artist, song) {
   const url = new URL("https://itunes.apple.com/search");
@@ -392,6 +447,7 @@ async function validateSongExists(artist, song) {
     .sort((a, b) => b.totalScore - a.totalScore);
 
   const best = candidates[0] || null;
+  const versions = getLikelyVersions(candidates);
 
   if (isAcceptedSongMatch(best)) {
     return {
@@ -402,22 +458,21 @@ async function validateSongExists(artist, song) {
         album: best.album || "",
         source: best.source
       },
-      suggestions: candidates.slice(0, 3)
+      versions,
+      suggestions: versions.length ? versions.slice(0, 3) : candidates.slice(0, 3).map(toPublicVersion)
     };
   }
+
+  const suggestions = candidates
+    .filter(item => item.titleScore >= 0.35 || item.artistScore >= 0.5)
+    .slice(0, 3)
+    .map(toPublicVersion);
 
   return {
     found: false,
     canonical: null,
-    suggestions: candidates
-      .filter(item => item.titleScore >= 0.35 || item.artistScore >= 0.5)
-      .slice(0, 3)
-      .map(item => ({
-        artist: item.artist,
-        song: item.song,
-        album: item.album || "",
-        source: item.source
-      }))
+    versions: [],
+    suggestions
   };
 }
 
@@ -610,23 +665,43 @@ export default async function handler(req, res) {
     const song = String(body.song || "").trim();
     const note = String(body.note || "").trim();
     const depth = String(body.depth || "standard").trim();
+    const selectedVersion = sanitizeSelectedVersion(body.selectedVersion);
 
     if (!artist || !song) {
       return res.status(400).json({ error: "請輸入歌手與歌名。" });
     }
 
-    const validation = await validateSongExists(artist, song);
+    let verifiedArtist = artist;
+    let verifiedSong = song;
+    let verifiedAlbum = "";
 
-    if (!validation.found) {
-      return res.status(404).json({
-        code: "song_not_found",
-        error: makeSongNotFoundMessage(artist, song, validation.suggestions),
-        suggestions: validation.suggestions
-      });
+    if (selectedVersion) {
+      verifiedArtist = selectedVersion.artist;
+      verifiedSong = selectedVersion.song;
+      verifiedAlbum = selectedVersion.album || "";
+    } else {
+      const validation = await validateSongExists(artist, song);
+
+      if (!validation.found) {
+        return res.status(404).json({
+          code: "song_not_found",
+          error: makeSongNotFoundMessage(artist, song, validation.suggestions),
+          suggestions: validation.suggestions
+        });
+      }
+
+      if (hasMeaningfulVersionChoices(validation.versions)) {
+        return res.status(409).json({
+          code: "song_versions_found",
+          error: "找到多個可能版本，請選擇你要分析的歌曲版本。",
+          versions: validation.versions
+        });
+      }
+
+      verifiedArtist = validation.canonical && validation.canonical.artist ? validation.canonical.artist : artist;
+      verifiedSong = validation.canonical && validation.canonical.song ? validation.canonical.song : song;
+      verifiedAlbum = validation.canonical && validation.canonical.album ? validation.canonical.album : "";
     }
-
-    const verifiedArtist = validation.canonical && validation.canonical.artist ? validation.canonical.artist : artist;
-    const verifiedSong = validation.canonical && validation.canonical.song ? validation.canonical.song : song;
 
     const openaiResponse = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
@@ -637,7 +712,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: OPENAI_MODEL,
         instructions: buildInstructions(depth, note),
-        input: `請分析：歌手「${verifiedArtist}」，歌曲「${verifiedSong}」。此歌曲已通過資料庫存在性檢查，請以此正式歌曲資訊分析。`,
+        input: `請分析：歌手「${verifiedArtist}」，歌曲「${verifiedSong}」${verifiedAlbum ? `，版本/專輯「${verifiedAlbum}」` : ""}。此歌曲已通過資料庫存在性檢查，請以此正式歌曲資訊分析。`,
         temperature: depth === "director" ? 0.98 : 0.88,
         max_output_tokens: 2200,
         store: false,
@@ -689,7 +764,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       data,
-      verifiedSong: { artist: verifiedArtist, song: verifiedSong }
+      verifiedSong: { artist: verifiedArtist, song: verifiedSong, album: verifiedAlbum }
     });
   } catch (error) {
     console.error(error);
