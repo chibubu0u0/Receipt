@@ -513,7 +513,7 @@ function buildInstructions(depth, note) {
 
 重要限制：
 - 不要引用或改寫任何完整歌詞。可以描述情緒、聲音、氛圍與可推測的畫面。
-- lyricEssence 可以呈現「最經典歌詞意象」，但 quote 欄位最多只能放 10 個字以內的極短片段；如果不確定或容易超過限制，quote 請填空字串。summary 必須用自己的話概括，不要複製歌詞。
+- lyricEssence 可以呈現「最經典歌詞意象」，但 quote 欄位只能放非常短且完整的片段：中文最多 10 個字，英文最多 5 個單字。不要為了符合限制而截斷單字或半句；如果無法完整呈現，quote 請填空字串。summary 必須用自己的話概括，不要複製歌詞。
 - 如果你不確定冷門歌曲的完整資料，根據歌手風格、曲名語意與可推測的音樂情緒生成，但不要假裝知道不存在的細節。
 - 只回傳 JSON，不要 markdown，不要解釋。
 - 不要輸出你的思考過程、自我檢查過程或草稿。
@@ -529,7 +529,7 @@ function buildInstructions(depth, note) {
 用戶補充語氣：${note || "無"}
 
 欄位寫作規則：
-- lyricEssence：呈現「經典歌詞意象」。title 是 8 字以內小標；summary 是 1-2 句，用自己的話概括歌詞最被記住的情緒或畫面，不要照抄歌詞；quote 最多 10 個字以內，也可以是空字串。
+- lyricEssence：呈現「經典歌詞意象」。title 是 8 字以內小標；summary 是 1-2 句，用自己的話概括歌詞最被記住的情緒或畫面，不要照抄歌詞；quote 只能是完整短片段，中文最多 10 個字，英文最多 5 個單字。不能截斷單字或半句；不確定就填空字串。
 - soul：2 到 3 句，每句都要有具體場景、動作或感官細節。標準分析要清楚；深層進化要更細膩；導演版要更像鏡頭描述。
 - tagline：12 字以內，像唱片行牆上的一句標語。
 - emotions：4 個，name 要具體有畫面，label 2-4 字，value 0-100。
@@ -561,6 +561,37 @@ function getOutputText(result) {
   }
 
   return "";
+}
+
+
+
+function cleanLyricEssenceQuote(data) {
+  if (!data || !data.lyricEssence || typeof data.lyricEssence !== "object") return data;
+
+  const raw = String(data.lyricEssence.quote || "").replace(/[「」"]/g, "").trim();
+
+  if (!raw) {
+    data.lyricEssence.quote = "";
+    return data;
+  }
+
+  const isEnglishLike = /[A-Za-z]/.test(raw);
+  const words = raw.split(/\s+/).filter(Boolean);
+
+  if (isEnglishLike) {
+    const lastWord = words[words.length - 1] || "";
+
+    if (words.length > 5 || lastWord.length <= 2 || (/[A-Za-z]$/.test(raw) && lastWord.length < 4 && words.length > 1)) {
+      data.lyricEssence.quote = "";
+      return data;
+    }
+  } else if (raw.length > 12) {
+    data.lyricEssence.quote = "";
+    return data;
+  }
+
+  data.lyricEssence.quote = raw;
+  return data;
 }
 
 
@@ -773,7 +804,7 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: "OpenAI 回傳的 JSON 無法解析。" });
     }
 
-    data = ensureSongSpecificColors(data, verifiedArtist, verifiedSong);
+    data = ensureSongSpecificColors(cleanLyricEssenceQuote(data), verifiedArtist, verifiedSong);
 
     return res.status(200).json({
       data,

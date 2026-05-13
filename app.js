@@ -135,6 +135,33 @@ function escapeHtml(value) {
 function compactReceiptText(value, maxLength = 70) {
   const text = sanitizeText(value, "").replace(/\s+/g, " ").trim();
 
+function cleanLyricQuote(value) {
+  const quote = sanitizeText(value, "").replace(/[「」"]/g, "").trim();
+
+  if (!quote) return "";
+
+  const words = quote.split(/\s+/).filter(Boolean);
+  const isEnglishLike = /[A-Za-z]/.test(quote);
+
+  // 避免顯示被 AI 或字數限制截斷的英文片段，例如 "You're bea"。
+  if (isEnglishLike) {
+    if (words.length > 5) return "";
+    const lastWord = words[words.length - 1] || "";
+
+    if (lastWord.length <= 2) return "";
+    if (/[A-Za-z]$/.test(quote) && lastWord.length < 4 && words.length > 1) return "";
+
+    return quote;
+  }
+
+  // 中文短句可以保留，但不要太長。
+  if (quote.length > 12) return "";
+
+  return quote;
+}
+
+
+
   if (text.length <= maxLength) return text;
   return `${text.slice(0, Math.max(0, maxLength - 1))}…`;
 }
@@ -169,7 +196,7 @@ function normalizeData(data) {
     lyricEssence: {
       title: sanitizeText(safe.lyricEssence?.title, demoData.lyricEssence?.title || "歌詞印象").slice(0, 8),
       summary: sanitizeText(safe.lyricEssence?.summary, demoData.lyricEssence?.summary || "這首歌被記住的不是某一句話，而是那種反覆回來的情緒。"),
-      quote: sanitizeText(safe.lyricEssence?.quote, "").slice(0, 10)
+      quote: cleanLyricQuote(safe.lyricEssence?.quote)
     },
     emotions: (Array.isArray(safe.emotions) && safe.emotions.length ? safe.emotions : demoData.emotions).slice(0, 4).map(item => ({
       icon: iconSvg[item.icon] ? item.icon : "circle",

@@ -4119,3 +4119,9 @@ body.exporting-png .receipt {
   font-size: 12px;
   line-height: 1.65;
 }
+
+
+/* Lyric quote fix: avoid awkward broken fragments */
+.lyric-essence-quote:empty {
+  display: none;
+}

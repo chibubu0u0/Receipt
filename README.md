@@ -858,3 +858,14 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
   5. 情緒輪廓
   6. 歌曲具現化
   7. 心情結帳
+
+
+## 歌詞短句斷字修正版
+
+這版修正「經典歌詞意象」短句被截斷的問題：
+
+- 前端不再用 `.slice(0, 10)` 硬切 quote
+- 新增 `cleanLyricQuote()`，避免顯示像 `You're bea` 這種被截斷的英文片段
+- 後端 prompt 改成：quote 必須是完整短片段，不能截斷單字或半句
+- 若無法完整呈現短片段，quote 會留空，只顯示歌詞意象 summary
+- 仍維持不輸出完整歌詞，降低版權風險
