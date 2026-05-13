@@ -748,3 +748,16 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 對應的小提示文字
 
 保留隱藏的 `sizeSelect`，避免現有程式碼找不到元素。
+
+
+## AI 生成自我檢視版
+
+這版調整 `/api/generate.js` 的 AI 指令：
+
+- 生成前先在內部反思第一版想法是否太通用
+- 檢視 soul / emotions / colors / melody / objects / items / closing 是否一致
+- 檢查整體是否像可以收藏與分享的「情感商品小票」
+- 避免每首歌重複使用固定詞彙、固定色票或固定物件
+- 最終只回傳修正後 JSON，不輸出思考過程或草稿
+
+注意：這不是把 AI 的思考過程顯示給使用者，而是讓模型在輸出前做內部品質檢查。
