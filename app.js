@@ -163,8 +163,8 @@ function cleanLyricQuote(value) {
     return quote;
   }
 
-  // 中文短句可以保留，但不要太長。
-  if (quote.length > 12) return "";
+  // 中文 / 日文 / 韓文等原文短句可以保留，但不要太長。
+  if (quote.length > 14) return "";
 
   return quote;
 }
@@ -350,7 +350,7 @@ function buildFullReceiptHtml(normalized) {
       <div class="section-label"><span>經典歌詞意象</span><span>02</span></div>
       <div class="lyric-essence-card">
         <div class="lyric-essence-title">${escapeHtml(normalized.lyricEssence.title)}</div>
-        ${normalized.lyricEssence.quote ? `<div class="lyric-essence-quote">「${escapeHtml(normalized.lyricEssence.quote)}」</div>` : ""}
+        ${normalized.lyricEssence.quote ? `<div class="lyric-essence-quote"><span>原文短句</span>「${escapeHtml(normalized.lyricEssence.quote)}」</div>` : ""}
         <p>${escapeHtml(normalized.lyricEssence.summary)}</p>
       </div>
     </section>

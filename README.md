@@ -879,3 +879,17 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 原因是函式被誤放進 `compactReceiptText()` 內部，導致 `normalizeData()` 無法呼叫
 - 已改成全域 helper function
 - 也調整錯誤訊息，避免一般前端錯誤都顯示成 Vercel 環境變數問題
+
+
+## 原文歌詞短句版
+
+這版調整「經典歌詞意象」：
+
+- quote 欄位若有內容，會要求 AI 保留原文，不翻譯
+- 英文歌詞短句以英文顯示，日文 / 韓文等也保留原文
+- summary 仍用繁體中文整理歌詞意象
+- quote 仍限制為很短的完整片段：
+  - 中文最多約 10 字
+  - 英文最多 5 個單字
+  - 不可截斷單字或半句
+- 若無法安全呈現完整短句，quote 會留空，只顯示意象摘要
