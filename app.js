@@ -135,6 +135,15 @@ function escapeHtml(value) {
 function compactReceiptText(value, maxLength = 70) {
   const text = sanitizeText(value, "").replace(/\s+/g, " ").trim();
 
+
+
+
+
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, Math.max(0, maxLength - 1))}…`;
+}
+
+
 function cleanLyricQuote(value) {
   const quote = sanitizeText(value, "").replace(/[「」"]/g, "").trim();
 
@@ -158,12 +167,6 @@ function cleanLyricQuote(value) {
   if (quote.length > 12) return "";
 
   return quote;
-}
-
-
-
-  if (text.length <= maxLength) return text;
-  return `${text.slice(0, Math.max(0, maxLength - 1))}…`;
 }
 
 
@@ -1222,7 +1225,11 @@ async function generateReceipt(selectedVersion = null) {
     setStatus("完成。收據已生成。", "ok");
   } catch (error) {
     console.error(error);
-    setStatus(`${error.message || "產生失敗，請確認後端 API 或網路狀態。"}${nl}如果剛設定完 Vercel 環境變數，請重新部署一次。`, "error");
+    const message = error.message || "產生失敗，請確認後端 API 或網路狀態。";
+    const hint = message.includes("OPENAI_API_KEY") || message.includes("環境變數")
+      ? `${nl}如果剛設定完 Vercel 環境變數，請重新部署一次。`
+      : "";
+    setStatus(`${message}${hint}`, "error");
   } finally {
     els.generateBtn.disabled = false;
   }

@@ -869,3 +869,13 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 後端 prompt 改成：quote 必須是完整短片段，不能截斷單字或半句
 - 若無法完整呈現短片段，quote 會留空，只顯示歌詞意象 summary
 - 仍維持不輸出完整歌詞，降低版權風險
+
+
+## cleanLyricQuote 錯誤修正版
+
+這版修正前一版的前端錯誤：
+
+- `cleanLyricQuote is not defined`
+- 原因是函式被誤放進 `compactReceiptText()` 內部，導致 `normalizeData()` 無法呼叫
+- 已改成全域 helper function
+- 也調整錯誤訊息，避免一般前端錯誤都顯示成 Vercel 環境變數問題
