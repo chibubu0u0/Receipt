@@ -3867,3 +3867,32 @@ body.exporting-png .receipt {
 #accountCard {
   display: none !important;
 }
+
+
+/* Typewriter-style CJK refinement */
+.receipt {
+  font-family: "Courier New", "LXGW WenKai Mono TC", "Noto Serif TC", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.receipt-title {
+  font-family: "Noto Serif TC", "LXGW WenKai Mono TC", "Courier New", serif;
+  font-weight: 900;
+  letter-spacing: -.05em;
+}
+
+.receipt-subtitle {
+  font-family: "Courier New", "LXGW WenKai Mono TC", ui-monospace, monospace;
+  letter-spacing: .16em;
+  font-size: 12px;
+}
+
+.soul,
+.tagline,
+.emotion-name,
+.color-name,
+.object-item,
+.items-table,
+.closing,
+.total-vibe {
+  font-family: "LXGW WenKai Mono TC", "Courier New", ui-monospace, monospace;
+}

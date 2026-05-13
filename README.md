@@ -761,3 +761,13 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 最終只回傳修正後 JSON，不輸出思考過程或草稿
 
 注意：這不是把 AI 的思考過程顯示給使用者，而是讓模型在輸出前做內部品質檢查。
+
+
+## Typewriter subtitle + CJK font update
+
+這版調整：
+
+- 將收據副標從 `AI EMOTIONAL CHECKOUT` 改成 `YOUR PERSONAL EMOTIONAL CHECKOUT`
+- 新增 Google Fonts：`LXGW WenKai Mono TC` 與 `Noto Serif TC`
+- 中文內容優先使用 `LXGW WenKai Mono TC`，讓中文更接近等寬 / 打字機感
+- 標題保留較厚重的繁中襯線風格，避免中文標題太像一般系統字
