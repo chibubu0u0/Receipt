@@ -3951,3 +3951,27 @@ body.exporting-png .receipt {
 .receipt:not(.night) .items-table td:nth-child(3) {
   color: #7a7168;
 }
+
+
+/* Slightly stronger title weight */
+.receipt-title,
+.tagline,
+.total-vibe {
+  font-weight: 400;
+}
+
+.section-label,
+.total-label {
+  font-weight: 400;
+}
+
+.receipt:not(.night) .receipt-title,
+.receipt:not(.night) .tagline,
+.receipt:not(.night) .total-vibe {
+  color: #3f3933;
+}
+
+.receipt:not(.night) .section-label,
+.receipt:not(.night) .total-label {
+  color: #72695f;
+}
