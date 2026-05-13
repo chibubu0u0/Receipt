@@ -771,3 +771,22 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 新增 Google Fonts：`LXGW WenKai Mono TC` 與 `Noto Serif TC`
 - 中文內容優先使用 `LXGW WenKai Mono TC`，讓中文更接近等寬 / 打字機感
 - 標題保留較厚重的繁中襯線風格，避免中文標題太像一般系統字
+
+
+## Subtitle update
+
+這版將收據副標改為：
+
+`EMOTION CHECKOUT`
+
+
+## 昭和風格漢字字體版
+
+這版調整字體方向：
+
+- 新增 Google Font：`Zen Antique`
+- 「歌曲收據」主標題、章節標題、tagline、整體氛圍改用 `Zen Antique`
+- 內文保留 `LXGW WenKai Mono TC`，讓收據仍有等寬 / 打字機感
+- 英文歌名、副標、歌手名稱保留 Courier 系列打字機感
+
+整體方向：昭和老店招牌感 + 熱感應收據紙 + 唱片行小票。

@@ -3869,30 +3869,45 @@ body.exporting-png .receipt {
 }
 
 
-/* Typewriter-style CJK refinement */
-.receipt {
-  font-family: "Courier New", "LXGW WenKai Mono TC", "Noto Serif TC", ui-monospace, SFMono-Regular, Menlo, monospace;
-}
 
+
+/* Showa-style kanji update */
 .receipt-title {
-  font-family: "Noto Serif TC", "LXGW WenKai Mono TC", "Courier New", serif;
-  font-weight: 900;
-  letter-spacing: -.05em;
+  font-family: "Zen Antique", "Noto Serif TC", serif;
+  font-weight: 400;
+  letter-spacing: -.03em;
 }
 
-.receipt-subtitle {
+.section-label,
+.total-label {
+  font-family: "Zen Antique", "Noto Serif TC", serif;
+  letter-spacing: .12em;
+}
+
+.tagline,
+.total-vibe {
+  font-family: "Zen Antique", "Noto Serif TC", serif;
+  font-weight: 400;
+  letter-spacing: -.03em;
+}
+
+.receipt-subtitle,
+.song-name,
+.artist-name {
   font-family: "Courier New", "LXGW WenKai Mono TC", ui-monospace, monospace;
-  letter-spacing: .16em;
-  font-size: 12px;
 }
 
 .soul,
-.tagline,
 .emotion-name,
 .color-name,
 .object-item,
 .items-table,
 .closing,
-.total-vibe {
+.melody-label {
+  font-family: "LXGW WenKai Mono TC", "Courier New", ui-monospace, monospace;
+}
+
+/* Keep receipt body readable while giving headings a Showa kissaten feel */
+.receipt {
   font-family: "LXGW WenKai Mono TC", "Courier New", ui-monospace, monospace;
 }
