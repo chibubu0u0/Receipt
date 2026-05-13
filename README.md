@@ -893,3 +893,19 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
   - 英文最多 5 個單字
   - 不可截斷單字或半句
 - 若無法安全呈現完整短句，quote 會留空，只顯示意象摘要
+
+
+## 原文歌詞顯示強化版
+
+這版修正「quote 還是沒有改成原文」的問題：
+
+- 後端 prompt 更明確要求 quote 使用歌曲原始語言
+  - 英文歌：英文
+  - 日文歌：日文
+  - 韓文歌：韓文
+  - 中文歌：中文
+- quote 禁止翻譯成繁體中文；只有 summary 使用繁體中文
+- 前端 `cleanLyricQuote()` 放寬，避免英文短句因為單字太短被整句隱藏
+- quote 標籤從「原文短句」簡化為「原文」
+
+注意：舊的歷史紀錄不會自動更新；請重新生成一次，才會套用新的 AI prompt。

@@ -4135,3 +4135,15 @@ body.exporting-png .receipt {
   font-size: 10px;
   letter-spacing: .12em;
 }
+
+
+/* Original lyric quote display refinement */
+.lyric-essence-quote {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.lyric-essence-quote span {
+  font-size: 9px;
+  opacity: .78;
+}

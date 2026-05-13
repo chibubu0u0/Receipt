@@ -152,14 +152,10 @@ function cleanLyricQuote(value) {
   const words = quote.split(/\s+/).filter(Boolean);
   const isEnglishLike = /[A-Za-z]/.test(quote);
 
-  // 避免顯示被 AI 或字數限制截斷的英文片段，例如 "You're bea"。
+  // 保留原文短句：英文最多 5 個單字，不再因為短單字而整句消失。
   if (isEnglishLike) {
     if (words.length > 5) return "";
-    const lastWord = words[words.length - 1] || "";
-
-    if (lastWord.length <= 2) return "";
-    if (/[A-Za-z]$/.test(quote) && lastWord.length < 4 && words.length > 1) return "";
-
+    if (quote.length > 48) return "";
     return quote;
   }
 
@@ -168,7 +164,6 @@ function cleanLyricQuote(value) {
 
   return quote;
 }
-
 
 function clampNumber(value, min = 0, max = 100) {
   const n = Number(value);
@@ -350,7 +345,7 @@ function buildFullReceiptHtml(normalized) {
       <div class="section-label"><span>經典歌詞意象</span><span>02</span></div>
       <div class="lyric-essence-card">
         <div class="lyric-essence-title">${escapeHtml(normalized.lyricEssence.title)}</div>
-        ${normalized.lyricEssence.quote ? `<div class="lyric-essence-quote"><span>原文短句</span>「${escapeHtml(normalized.lyricEssence.quote)}」</div>` : ""}
+        ${normalized.lyricEssence.quote ? `<div class="lyric-essence-quote"><span>原文</span>「${escapeHtml(normalized.lyricEssence.quote)}」</div>` : ""}
         <p>${escapeHtml(normalized.lyricEssence.summary)}</p>
       </div>
     </section>
