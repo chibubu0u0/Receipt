@@ -790,3 +790,14 @@ SUPABASE_SERVICE_ROLE_KEY=你的 Supabase secret/service role key
 - 英文歌名、副標、歌手名稱保留 Courier 系列打字機感
 
 整體方向：昭和老店招牌感 + 熱感應收據紙 + 唱片行小票。
+
+
+## 中文 ExtraLight 200 字體版
+
+這版依需求調整：
+
+- 中文整體改用 `Noto Serif TC`，字重設定為 `ExtraLight 200`
+- 主標題、章節標題、內文、情緒標籤、色彩語言、結語等中文內容都套用同一套 ExtraLight 200
+- 英文歌名、副標、數字欄位仍保留 Courier New 打字機感，避免收據感消失
+
+注意：如果瀏覽器尚未載入 Google Fonts，會短暫顯示系統字體；載入完成後會切換成 ExtraLight 200。

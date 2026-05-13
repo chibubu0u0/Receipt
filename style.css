@@ -3871,32 +3871,25 @@ body.exporting-png .receipt {
 
 
 
-/* Showa-style kanji update */
-.receipt-title {
-  font-family: "Zen Antique", "Noto Serif TC", serif;
-  font-weight: 400;
-  letter-spacing: -.03em;
+
+/* Keep receipt body readable while giving headings a Showa kissaten feel */
+.receipt {
+  font-family: "LXGW WenKai Mono TC", "Courier New", ui-monospace, monospace;
 }
 
+
+/* Chinese font update: ExtraLight 200 */
+:root {
+  --zh-font-extralight: "Noto Serif TC", serif;
+}
+
+/* 中文整體改用 ExtraLight 200 */
+.receipt,
+.receipt-title,
 .section-label,
-.total-label {
-  font-family: "Zen Antique", "Noto Serif TC", serif;
-  letter-spacing: .12em;
-}
-
+.total-label,
 .tagline,
-.total-vibe {
-  font-family: "Zen Antique", "Noto Serif TC", serif;
-  font-weight: 400;
-  letter-spacing: -.03em;
-}
-
-.receipt-subtitle,
-.song-name,
-.artist-name {
-  font-family: "Courier New", "LXGW WenKai Mono TC", ui-monospace, monospace;
-}
-
+.total-vibe,
 .soul,
 .emotion-name,
 .color-name,
@@ -3904,10 +3897,27 @@ body.exporting-png .receipt {
 .items-table,
 .closing,
 .melody-label {
-  font-family: "LXGW WenKai Mono TC", "Courier New", ui-monospace, monospace;
+  font-family: var(--zh-font-extralight);
+  font-weight: 200;
 }
 
-/* Keep receipt body readable while giving headings a Showa kissaten feel */
-.receipt {
-  font-family: "LXGW WenKai Mono TC", "Courier New", ui-monospace, monospace;
+/* 英文與數字仍保留打字機感，避免歌名失去收據感 */
+.receipt-subtitle,
+.song-name,
+.artist-name,
+.bar-line,
+.color-row span:last-child,
+.items-table td:nth-child(2),
+.items-table td:nth-child(3) {
+  font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* 標題用同字體但稍微拉開，維持乾淨復古感 */
+.receipt-title {
+  letter-spacing: -.04em;
+}
+
+.section-label,
+.total-label {
+  letter-spacing: .14em;
 }
